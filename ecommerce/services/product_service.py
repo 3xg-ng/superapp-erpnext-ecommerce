@@ -6,31 +6,31 @@ from ecommerce.utils.response_helper import create_response
 def list_items(limit=50, offset=0, search=None, name=None, category=None, min_price=None, max_price=None, color=None, brand=None, rating=None, sort=None):
     try:
         query = """
-            SELECT item_code, item_name, item_group, last_purchase_rate, standard_rate, image, valuation_rate, brand, description, naming_series, asset_category, weight_per_unit, is_stock_item, color, total_projected_qty, no_of_months_exp, collection
-            FROM `tabItem`
+            SELECT *
+            FROM `tabProducts`
             WHERE 1=1
         """
         
         filters = []
         
         if search:
-            query += " AND (item_name LIKE %s OR description LIKE %s)"
+            query += " AND (product_name LIKE %s OR description LIKE %s)"
             filters.extend([f"%{search}%", f"%{search}%"])
 
         if name:
-            query += " AND (item_name LIKE %s)"
+            query += " AND (product_name LIKE %s)"
             filters.append(f"{name}%")
 
         if category:
-            query += " AND item_group = %s"
+            query += " AND category = %s"
             filters.append(category)
 
         if min_price is not None:
-            query += " AND standard_rate >= %s"
+            query += " AND new_price >= %s"
             filters.append(min_price)
         
         if max_price is not None:
-            query += " AND standard_rate <= %s"
+            query += " AND new_price <= %s"
             filters.append(max_price)
 
         if color:
@@ -42,7 +42,7 @@ def list_items(limit=50, offset=0, search=None, name=None, category=None, min_pr
             filters.append(brand)
             
         if rating:
-            query += " AND valuation_rate = %s"
+            query += " AND rating = %s"
             filters.append(rating)
 
         if sort:
@@ -51,11 +51,11 @@ def list_items(limit=50, offset=0, search=None, name=None, category=None, min_pr
             elif sort == "newest":
                 query += " ORDER BY creation_date DESC"
             elif sort == "highest_to_lowest":
-                query += " ORDER BY standard_rate DESC" 
+                query += " ORDER BY new_price DESC" 
             elif sort == "lowest_to_highest":
-                query += " ORDER BY standard_rate ASC"
+                query += " ORDER BY new_price ASC"
         else:
-            query += " ORDER BY item_name ASC"
+            query += " ORDER BY product_name ASC"
 
         query += " LIMIT %s OFFSET %s"
         filters.extend([limit, offset])
@@ -79,8 +79,8 @@ def list_items(limit=50, offset=0, search=None, name=None, category=None, min_pr
 def list_items_category(limit=8, offset=0, search=None, letter=None, category=None, min_price=None, max_price=None):
     try:
         query = """
-            SELECT item_code, item_name, item_group, last_purchase_rate, standard_rate, image, valuation_rate, brand, description, naming_series, asset_category, weight_per_unit, is_stock_item, color, total_projected_qty, no_of_months_exp, collection
-            FROM `tabItem`
+            SELECT item_code, product_name, category, old_price, new_price, image, rating, brand, description, naming_series, asset_category, weight_per_unit, is_stock_item, color, total_projected_qty, no_of_months_exp, collection
+            FROM `tabProducts`
             WHERE 1=1
         """
         
@@ -88,26 +88,26 @@ def list_items_category(limit=8, offset=0, search=None, letter=None, category=No
         
         # General search for item name or description
         if search:
-            query += " AND (item_name LIKE %s OR description LIKE %s)"
+            query += " AND (product_name LIKE %s OR description LIKE %s)"
             filters.extend([f"%{search}%", f"%{search}%"])
 
         # Search for items that start with a specific letter
         if letter:
-            query += " AND (item_name LIKE %s OR description LIKE %s)"
+            query += " AND (product_name LIKE %s OR description LIKE %s)"
             filters.extend([f"{letter}%", f"{letter}%"])
 
         # Filter by category
         if category:
-            query += " AND item_group = %s"
+            query += " AND category = %s"
             filters.append(category)
 
         # Price range filters
         if min_price is not None:
-            query += " AND standard_rate >= %s"
+            query += " AND new_price >= %s"
             filters.append(min_price)
         
         if max_price is not None:
-            query += " AND standard_rate <= %s"
+            query += " AND new_price <= %s"
             filters.append(max_price)
 
         # Limit and offset
@@ -126,7 +126,7 @@ def list_items_category(limit=8, offset=0, search=None, letter=None, category=No
 
         for item in items:
             # Group by category
-            category_name = item['item_group']
+            category_name = item['category']
             if category_name not in categories:
                 categories[category_name] = {
                     'category': category_name,
@@ -168,26 +168,26 @@ def list_items_smartphone(limit=50, offset=0, search=None, category=None, min_pr
     try:
         query = """
             SELECT *
-            FROM `tabItem`
-            WHERE item_group="Smartphones"
+            FROM `tabProducts`
+            WHERE category="Smartphones"
         """
         
         filters = []
         
         if search:
-            query += " AND (item_name LIKE %s OR description LIKE %s)"
+            query += " AND (product_name LIKE %s OR description LIKE %s)"
             filters.extend([f"%{search}%", f"%{search}%"])
 
         if category:
-            query += " AND item_group = %s"
+            query += " AND category = %s"
             filters.append(category)
 
         if min_price is not None:
-            query += " AND standard_rate >= %s"
+            query += " AND new_price >= %s"
             filters.append(min_price)
         
         if max_price is not None:
-            query += " AND standard_rate <= %s"
+            query += " AND new_price <= %s"
             filters.append(max_price)
 
         query += " LIMIT %s OFFSET %s"
@@ -214,26 +214,26 @@ def list_items_accessories(limit=50, offset=0, search=None, category=None, min_p
     try:
         query = """
             SELECT *
-            FROM `tabItem`
-            WHERE item_group="Accessories"
+            FROM `tabProducts`
+            WHERE category="Accessories"
         """
         
         filters = []
         
         if search:
-            query += " AND (item_name LIKE %s OR description LIKE %s)"
+            query += " AND (product_name LIKE %s OR description LIKE %s)"
             filters.extend([f"%{search}%", f"%{search}%"])
 
         if category:
-            query += " AND item_group = %s"
+            query += " AND category = %s"
             filters.append(category)
 
         if min_price is not None:
-            query += " AND standard_rate >= %s"
+            query += " AND new_price >= %s"
             filters.append(min_price)
         
         if max_price is not None:
-            query += " AND standard_rate <= %s"
+            query += " AND new_price <= %s"
             filters.append(max_price)
 
         query += " LIMIT %s OFFSET %s"
@@ -260,26 +260,26 @@ def list_items_laptops(limit=50, offset=0, search=None, category=None, min_price
     try:
         query = """
             SELECT *
-            FROM `tabItem`
-            WHERE item_group="Laptops"
+            FROM `tabProducts`
+            WHERE category="Laptops"
         """
         
         filters = []
         
         if search:
-            query += " AND (item_name LIKE %s OR description LIKE %s)"
+            query += " AND (product_name LIKE %s OR description LIKE %s)"
             filters.extend([f"%{search}%", f"%{search}%"])
 
         if category:
-            query += " AND item_group = %s"
+            query += " AND category = %s"
             filters.append(category)
 
         if min_price is not None:
-            query += " AND standard_rate >= %s"
+            query += " AND new_price >= %s"
             filters.append(min_price)
         
         if max_price is not None:
-            query += " AND standard_rate <= %s"
+            query += " AND new_price <= %s"
             filters.append(max_price)
 
         query += " LIMIT %s OFFSET %s"
@@ -307,26 +307,26 @@ def list_items_home_appliance(limit=50, offset=0, search=None, category=None, mi
     try:
         query = """
             SELECT *
-            FROM `tabItem`
-            WHERE item_group="Home Appliance"
+            FROM `tabProducts`
+            WHERE category="Home Appliance"
         """
         
         filters = []
         
         if search:
-            query += " AND (item_name LIKE %s OR description LIKE %s)"
+            query += " AND (product_name LIKE %s OR description LIKE %s)"
             filters.extend([f"%{search}%", f"%{search}%"])
 
         if category:
-            query += " AND item_group = %s"
+            query += " AND category = %s"
             filters.append(category)
 
         if min_price is not None:
-            query += " AND standard_rate >= %s"
+            query += " AND new_price >= %s"
             filters.append(min_price)
         
         if max_price is not None:
-            query += " AND standard_rate <= %s"
+            query += " AND new_price <= %s"
             filters.append(max_price)
 
         query += " LIMIT %s OFFSET %s"
@@ -353,26 +353,26 @@ def list_items_kiddies(limit=50, offset=0, search=None, category=None, min_price
     try:
         query = """
             SELECT *
-            FROM `tabItem`
-            WHERE item_group="Kiddies"
+            FROM `tabProducts`
+            WHERE category="Kiddies"
         """
         
         filters = []
         
         if search:
-            query += " AND (item_name LIKE %s OR description LIKE %s)"
+            query += " AND (product_name LIKE %s OR description LIKE %s)"
             filters.extend([f"%{search}%", f"%{search}%"])
 
         if category:
-            query += " AND item_group = %s"
+            query += " AND category = %s"
             filters.append(category)
 
         if min_price is not None:
-            query += " AND standard_rate >= %s"
+            query += " AND new_price >= %s"
             filters.append(min_price)
         
         if max_price is not None:
-            query += " AND standard_rate <= %s"
+            query += " AND new_price <= %s"
             filters.append(max_price)
 
         query += " LIMIT %s OFFSET %s"
@@ -399,14 +399,14 @@ def list_items_new_arrival(limit=50, offset=0, search=None, category=None, min_p
     try:
         query = """
             SELECT *
-            FROM `tabItem`
+            FROM `tabProducts`
             WHERE collection="New Arrival"
         """
         
         filters = []
         
         if search:
-            query += " AND (item_name LIKE %s OR description LIKE %s)"
+            query += " AND (product_name LIKE %s OR description LIKE %s)"
             filters.extend([f"%{search}%", f"%{search}%"])
 
         if category:
@@ -414,11 +414,11 @@ def list_items_new_arrival(limit=50, offset=0, search=None, category=None, min_p
             filters.append(category)
 
         if min_price is not None:
-            query += " AND standard_rate >= %s"
+            query += " AND new_price >= %s"
             filters.append(min_price)
         
         if max_price is not None:
-            query += " AND standard_rate <= %s"
+            query += " AND new_price <= %s"
             filters.append(max_price)
 
         query += " LIMIT %s OFFSET %s"
@@ -445,14 +445,14 @@ def list_items_official_store(limit=50, offset=0, search=None, category=None, mi
     try:
         query = """
             SELECT *
-            FROM `tabItem`
+            FROM `tabProducts`
             WHERE collection="Official Store"
         """
         
         filters = []
         
         if search:
-            query += " AND (item_name LIKE %s OR description LIKE %s)"
+            query += " AND (product_name LIKE %s OR description LIKE %s)"
             filters.extend([f"%{search}%", f"%{search}%"])
 
         if category:
@@ -460,11 +460,11 @@ def list_items_official_store(limit=50, offset=0, search=None, category=None, mi
             filters.append(category)
 
         if min_price is not None:
-            query += " AND standard_rate >= %s"
+            query += " AND new_price >= %s"
             filters.append(min_price)
         
         if max_price is not None:
-            query += " AND standard_rate <= %s"
+            query += " AND new_price <= %s"
             filters.append(max_price)
 
         query += " LIMIT %s OFFSET %s"
@@ -491,14 +491,14 @@ def list_items_best_seller(limit=50, offset=0, search=None, category=None, min_p
     try:
         query = """
             SELECT *
-            FROM `tabItem`
+            FROM `tabProducts`
             WHERE collection="Best Seller"
         """
         
         filters = []
         
         if search:
-            query += " AND (item_name LIKE %s OR description LIKE %s)"
+            query += " AND (product_name LIKE %s OR description LIKE %s)"
             filters.extend([f"%{search}%", f"%{search}%"])
 
         if category:
@@ -506,11 +506,11 @@ def list_items_best_seller(limit=50, offset=0, search=None, category=None, min_p
             filters.append(category)
 
         if min_price is not None:
-            query += " AND standard_rate >= %s"
+            query += " AND new_price >= %s"
             filters.append(min_price)
         
         if max_price is not None:
-            query += " AND standard_rate <= %s"
+            query += " AND new_price <= %s"
             filters.append(max_price)
 
         query += " LIMIT %s OFFSET %s"
@@ -536,7 +536,7 @@ def get_item_by_code(item_code):
     try:
         query = """
             SELECT *
-            FROM `tabItem`
+            FROM `tabProducts`
             WHERE item_code = %s
         """
         
@@ -556,7 +556,7 @@ def get_item_by_code(item_code):
 
 
 ### Add new item
-def add_new_item(sku, item_name, category, old_price, new_price, image, rating, brand, description, product_line, model, weight, availability, color, quantity, warranty, stock_uom="Nos"):
+def add_new_item(sku, product_name, category, old_price, new_price, image, rating, brand, description, product_line, model, weight, availability, color, quantity, warranty, stock_uom="Nos"):
     
     try:
         if frappe.db.exists("Item", {"item_code": sku}):
@@ -564,14 +564,14 @@ def add_new_item(sku, item_name, category, old_price, new_price, image, rating, 
 
         new_item = frappe.get_doc({
             "doctype": "Item",
-            "name": item_name,
+            "name": product_name,
             "item_code": sku,
-            "item_name": item_name,
-            "item_group": category,
-            "last_purchase_rate": old_price,
-            "standard_rate": new_price,
+            "product_name": product_name,
+            "category": category,
+            "old_price": old_price,
+            "new_price": new_price,
             "image": image,
-            "valuation_rate": rating,
+            "rating": rating,
             "brand": brand,
             "description": description,
             "naming_series": product_line,
@@ -600,18 +600,18 @@ def add_new_item(sku, item_name, category, old_price, new_price, image, rating, 
 
 
 ### Update existing item by code
-def update_item_by_code(sku, item_name=None, category=None, old_price=None, new_price=None, image=None, rating=None, brand=None, description=None, product_line=None, model=None, weight=None, availability=None, color=None, quantity=None, warranty=None, collection=None):
+def update_item_by_code(sku, product_name=None, category=None, old_price=None, new_price=None, image=None, rating=None, brand=None, description=None, product_line=None, model=None, weight=None, availability=None, color=None, quantity=None, warranty=None, collection=None):
     try:
         item = frappe.get_doc("Item", {"item_code": sku})
         if not item:
             raise frappe.DoesNotExistError(f"Item with code {sku} not found!")
 
         attributes = {
-            "item_name": item_name,
-            "item_group": category,
-            "last_purchase_rate": old_price,
-            "standard_rate": new_price,
-            "valuation_rate": rating,
+            "product_name": product_name,
+            "category": category,
+            "old_price": old_price,
+            "new_price": new_price,
+            "rating": rating,
             "image": image,
             "brand": brand,
             "description": description,
