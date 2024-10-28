@@ -79,7 +79,7 @@ def list_items(limit=50, offset=0, search=None, name=None, category=None, min_pr
 def list_items_category(limit=8, offset=0, search=None, letter=None, category=None, min_price=None, max_price=None):
     try:
         query = """
-            SELECT item_code, product_name, category, old_price, new_price, image, rating, brand, description, naming_series, asset_category, weight_per_unit, is_stock_item, color, total_projected_qty, no_of_months_exp, collection
+            SELECT product_id, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty
             FROM `tabProducts`
             WHERE 1=1
         """
