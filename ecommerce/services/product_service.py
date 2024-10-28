@@ -532,7 +532,7 @@ def list_items_best_seller(limit=50, offset=0, search=None, category=None, min_p
 
 
 ### Get single item by code
-def get_item_by_code(product_id):v
+def get_item_by_code(product_id):
     try:
         query = """
             SELECT *
