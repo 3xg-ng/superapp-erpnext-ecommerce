@@ -532,18 +532,18 @@ def list_items_best_seller(limit=50, offset=0, search=None, category=None, min_p
 
 
 ### Get single item by code
-def get_item_by_code(item_code):
+def get_item_by_code(product_id):
     try:
         query = """
             SELECT *
             FROM `tabProducts`
-            WHERE item_code = %s
+            WHERE product_id = %s
         """
         
-        item = frappe.db.sql(query, [item_code], as_dict=True)
+        item = frappe.db.sql(query, [product_id], as_dict=True)
 
         if not item:
-            raise frappe.DoesNotExistError(f"Item with code {item_code} not found!")
+            raise frappe.DoesNotExistError(f"Item with code {product_id} not found!")
 
         return create_response(SUCCESS, item[0])
 
@@ -559,7 +559,7 @@ def get_item_by_code(item_code):
 def add_new_item(product_id, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty):
     
     try:
-        if frappe.db.exists("Item", {"item_code": product_id}):
+        if frappe.db.exists("Item", {"product_id": product_id}):
             raise ValueError(f"Item with code '{product_id}' already exists!")
 
         new_item = frappe.get_doc({
@@ -608,11 +608,11 @@ def add_new_item(product_id, product_name, category, old_price, new_price, image
 
 
 ### Update existing item by code
-def update_item_by_code(sku, product_name=None, category=None, old_price=None, new_price=None, image=None, rating=None, brand=None, description=None, product_line=None, model=None, weight=None, availability=None, color=None, quantity=None, warranty=None, collection=None):
+def update_item_by_code(product_id, product_name=None, category=None, old_price=None, new_price=None, image=None, rating=None, brand=None, description=None, product_line=None, model=None, weight=None, availability=None, color=None, quantity=None, warranty=None, collection=None):
     try:
-        item = frappe.get_doc("Item", {"item_code": sku})
+        item = frappe.get_doc("Item", {"product_id": product_id})
         if not item:
-            raise frappe.DoesNotExistError(f"Item with code {sku} not found!")
+            raise frappe.DoesNotExistError(f"Item with code {product_id} not found!")
 
         attributes = {
             "product_name": product_name,
@@ -640,28 +640,28 @@ def update_item_by_code(sku, product_name=None, category=None, old_price=None, n
         item.save()
         frappe.db.commit()
 
-        return create_response(SUCCESS, f"Item {item_code} updated successfully!")
+        return create_response(SUCCESS, f"Item {product_id} updated successfully!")
     except frappe.DoesNotExistError as e:
         return create_response(NOT_FOUND, str(e))
     except Exception as e:
-        frappe.log_error(message=str(e), title=f"Error updating item {item_code}")
+        frappe.log_error(message=str(e), title=f"Error updating item {product_id}")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 
 
 ### Delete item by code
-def delete_item_by_code(item_code):
+def delete_item_by_code(product_id):
     try:
-        if not frappe.db.exists("Item", {"item_code": item_code}):
-            raise frappe.DoesNotExistError(f"Item with code {item_code} not found!")
+        if not frappe.db.exists("Item", {"product_id": product_id}):
+            raise frappe.DoesNotExistError(f"Item with code {product_id} not found!")
 
-        frappe.delete_doc("Item", item_code)
+        frappe.delete_doc("Item", product_id)
         frappe.db.commit()
 
-        return create_response(SUCCESS, f"Item {item_code} deleted successfully!")
+        return create_response(SUCCESS, f"Item {product_id} deleted successfully!")
 
     except frappe.DoesNotExistError as e:
         return create_response(NOT_FOUND, str(e))
     except Exception as e:
-        frappe.log_error(message=str(e), title=f"Error deleting item {item_code}")
+        frappe.log_error(message=str(e), title=f"Error deleting item {product_id}")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
