@@ -556,11 +556,11 @@ def get_item_by_code(item_code):
 
 
 ### Add new item
-def add_new_item(product_id, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty, stock_uom="Nos"):
+def add_new_item(product_id, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty):
     
     try:
-        if frappe.db.exists("Item", {"item_code": sku}):
-            raise ValueError(f"Item with code '{sku}' already exists!")
+        if frappe.db.exists("Item", {"item_code": product_id}):
+            raise ValueError(f"Item with code '{product_id}' already exists!")
 
         new_item = frappe.get_doc({
             "doctype": "Products",
@@ -597,12 +597,12 @@ def add_new_item(product_id, product_name, category, old_price, new_price, image
         new_item.insert()
         frappe.db.commit()
 
-        return create_response(SUCCESS, f"Item '{sku}' added successfully!")
+        return create_response(SUCCESS, f"Item '{product_id}' added successfully!")
 
     except ValueError as e:
         return create_response(NOT_FOUND, str(e))
     except Exception as e:
-        frappe.log_error(f"Error adding new item '{sku}': {str(e)}", "Add Item Error")
+        frappe.log_error(f"Error adding new item '{product_id}': {str(e)}", "Add Item Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 
