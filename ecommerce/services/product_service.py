@@ -532,18 +532,18 @@ def list_items_best_seller(limit=50, offset=0, search=None, category=None, min_p
 
 
 ### Get single item by code
-def get_item_by_code(product_id):
+def get_item_by_code(name):
     try:
         query = """
             SELECT *
             FROM `tabProducts`
-            WHERE product_id = %s
+            WHERE name = %s
         """
         
-        item = frappe.db.sql(query, [product_id], as_dict=True)
+        item = frappe.db.sql(query, [name], as_dict=True)
 
         if not item:
-            raise frappe.DoesNotExistError(f"Item with code {product_id} not found!")
+            raise frappe.DoesNotExistError(f"Item with code {name} not found!")
 
         return create_response(SUCCESS, item[0])
 
