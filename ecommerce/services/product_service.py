@@ -556,34 +556,42 @@ def get_item_by_code(item_code):
 
 
 ### Add new item
-def add_new_item(sku, product_name, category, old_price, new_price, image, rating, brand, description, product_line, model, weight, availability, color, quantity, warranty, stock_uom="Nos"):
+def add_new_item(product_id, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty, stock_uom="Nos"):
     
     try:
         if frappe.db.exists("Item", {"item_code": sku}):
             raise ValueError(f"Item with code '{sku}' already exists!")
 
         new_item = frappe.get_doc({
-            "doctype": "Item",
-            "name": product_name,
-            "item_code": sku,
+            "doctype": "Products",
+            "product_id": product_id,
             "product_name": product_name,
             "category": category,
             "old_price": old_price,
             "new_price": new_price,
+            "brand": brand,
             "image": image,
             "rating": rating,
-            "brand": brand,
             "description": description,
-            "naming_series": product_line,
-            "asset_category": model,
-            "weight_per_unit": weight,
-            "is_stock_item": availability,
+            "dimension": dimension,
+            "display_type": display_type,
+            "resolution": resolution,
+            "features": features,
+            "chipset": chipset,
+            "cpu": cpu,
+            "internal_memory": internal_memory,
+            "ram": ram,
+            "battery_type": battery_type,
+            "battery_life": battery_life,
+            "charging": charging,
+            "magsafe_charging": magsafe_charging,
             "color": color,
-            "stock_uom": stock_uom,
-            "total_projected_qty": quantity,
-            "no_of_months_exp": warranty,
-            "opening_stock": 0, 
-            "default_warehouse": "Main Warehouse - WH" 
+            "quantity": quantity,
+            "availability": availability,
+            "collection": collection,
+            "model": model,
+            "weight": weight,
+            "warranty": warranty,
         })
 
         new_item.insert()
