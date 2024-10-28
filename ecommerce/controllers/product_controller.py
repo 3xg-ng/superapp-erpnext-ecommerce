@@ -53,8 +53,8 @@ def get_all_items_by_official_store():
     return list_items_official_store()
 
 @frappe.whitelist(allow_guest=True)
-def get_single_item(name):
-    return get_item_by_code(name)
+def get_single_item(product_id):
+    return get_item_by_code(product_id)
 
 @frappe.whitelist(allow_guest=True)
 def add_item(product_id, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty):
