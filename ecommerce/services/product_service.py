@@ -6,7 +6,7 @@ from ecommerce.utils.response_helper import create_response
 def list_items():
     try:
         query = """
-            SELECT product_name, old_price, new_price, image, rating
+            SELECT product_id, product_name, old_price, new_price, image, rating
             FROM `tabProducts`
             WHERE 1=1
         """
