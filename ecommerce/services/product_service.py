@@ -1,5 +1,5 @@
 import frappe
-from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR
+from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR, BAD_REQUEST
 from ecommerce.utils.response_helper import create_response
 
 ### Get all items
@@ -533,20 +533,17 @@ def list_items_best_seller(limit=50, offset=0, search=None, category=None, min_p
 ### Get single item by code
 def get_product_by_id():
     try:
-        # Retrieve the product_id from request parameters
-        product_id = frappe.local.request.params.get("product_id")
+        product_id = frappe.form_dict.get("product_id")
 
         if not product_id:
             raise ValueError("Product ID is required.")
 
-        # Define the SQL query to fetch a product by its ID
         query = """
             SELECT *
             FROM `tabProducts`
             WHERE product_id = %s
         """
 
-        # Execute the query with product_id as a parameter
         product = frappe.db.sql(query, (product_id,), as_dict=True)
 
         if not product:
@@ -561,6 +558,7 @@ def get_product_by_id():
     except Exception as e:
         frappe.log_error(message=str(e), title="Error fetching product by ID")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
 
 
 
