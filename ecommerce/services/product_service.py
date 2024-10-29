@@ -70,6 +70,50 @@ def list_items(limit=50, product_name=None, category=None, min_price=None, max_p
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 
+@frappe.whitelist(allow_guest=True)
+def search():
+    try:
+        # Get parameters from request
+        color = frappe.form_dict.get("color")
+        product_name = frappe.form_dict.get("product_name")
+        min_price = frappe.form_dict.get("min_price")
+        max_price = frappe.form_dict.get("max_price")
+        brand = frappe.form_dict.get("brand")
+        model = frappe.form_dict.get("model")
+        sort_by = frappe.form_dict.get("sort_by")
+        sort_order = frappe.form_dict.get("sort_order", "ASC")  # Default to ascending order if not specified
+
+        # Convert min_price and max_price to float if they are provided and valid
+        if min_price:
+            try:
+                min_price = float(min_price)
+            except ValueError:
+                return create_response(NOT_FOUND, "Invalid min_price format")
+
+        if max_price:
+            try:
+                max_price = float(max_price)
+            except ValueError:
+                return create_response(NOT_FOUND, "Invalid max_price format")
+
+        # Call the list_items function with the retrieved parameters
+        items = list_items(
+            color=color,
+            product_name=product_name,
+            min_price=min_price,
+            max_price=max_price,
+            brand=brand,
+            model=model,
+            sort_by=sort_by,
+            sort_order=sort_order
+        )
+
+        return items
+
+    except Exception as e:
+        frappe.log_error(message=str(e), title="Error in get_all_items")
+        return create_response(SERVER_ERROR, "An unexpected error occurred")
+
 
 def list_items_category(limit=8, offset=0, search=None, letter=None, category=None, min_price=None, max_price=None):
     try:

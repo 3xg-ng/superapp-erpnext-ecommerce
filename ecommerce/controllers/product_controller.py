@@ -4,34 +4,7 @@ from ecommerce.services.product_service import list_items, list_items_category, 
     
 @frappe.whitelist(allow_guest=True)
 def get_all_items():
-    # Get parameters from request
-    color = frappe.form_dict.get("color")
-    product_name = frappe.form_dict.get("product_name")
-    min_price = frappe.form_dict.get("min_price")
-    max_price = frappe.form_dict.get("max_price")
-    brand = frappe.form_dict.get("brand")
-    model = frappe.form_dict.get("model")
-    sort_by = frappe.form_dict.get("sort_by")
-    sort_order = frappe.form_dict.get("sort_order", "ASC")  # Default to ascending order if not specified
-    
-    # Convert min_price and max_price to float if they are provided
-    if min_price:
-        min_price = float(min_price)
-    if max_price:
-        max_price = float(max_price)
-    
-    # Call the list_items function with the retrieved parameters
-    return list_items(
-        color=color,
-        product_name=product_name,
-        min_price=min_price,
-        max_price=max_price,
-        brand=brand,
-        model=model,
-        sort_by=sort_by,
-        sort_order=sort_order
-    )
-
+    return list_items()
 
 
 @frappe.whitelist(allow_guest=True)
