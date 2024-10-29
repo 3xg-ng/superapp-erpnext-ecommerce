@@ -532,25 +532,27 @@ def list_items_best_seller(limit=50, offset=0, search=None, category=None, min_p
 
 
 ### Get single item by code
-def get_item_by_code(product_id):
+def get_product_by_id(product_id):
     try:
+        # Define the SQL query to fetch a product by its ID
         query = """
             SELECT *
             FROM `tabProducts`
             WHERE product_id = %s
         """
         
-        item = frappe.db.sql(query, [product_id], as_dict=True)
+        # Execute the query with product_id as a parameter
+        product = frappe.db.sql(query, (product_id,), as_dict=True)
 
-        if not item:
-            raise frappe.DoesNotExistError(f"Item with code {product_id} not found!")
+        if not product:
+            raise frappe.DoesNotExistError(f"Product with ID {product_id} not found!")
 
-        return create_response(SUCCESS, item[0])
+        return create_response(SUCCESS, product[0]) 
 
     except frappe.DoesNotExistError as e:
         return create_response(NOT_FOUND, str(e))
     except Exception as e:
-        frappe.log_error(message=str(e), title="Error fetching single item")
+        frappe.log_error(message=str(e), title="Error fetching product by ID")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 
