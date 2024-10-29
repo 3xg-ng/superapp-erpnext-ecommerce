@@ -3,7 +3,7 @@ from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR
 from ecommerce.utils.response_helper import create_response
 
 ### Get all items
-def list_items(limit=50, offset=0, search=None, name=None, category=None, min_price=None, max_price=None, color=None, brand=None, rating=None, sort=None):
+def list_items(limit=50, product_name=None, category=None, min_price=None, max_price=None, color=None, brand=None, rating=None, sort_by=None, sort_order="ASC")):
     try:
         query = """
             SELECT *
@@ -13,13 +13,9 @@ def list_items(limit=50, offset=0, search=None, name=None, category=None, min_pr
         
         filters = []
         
-        if search:
-            query += " AND (product_name LIKE %s OR description LIKE %s)"
-            filters.extend([f"%{search}%", f"%{search}%"])
-
-        if name:
-            query += " AND (product_name LIKE %s)"
-            filters.append(f"{name}%")
+        if product_name:
+            query += " AND product_name LIKE %s"
+            filters.append(f"%{product_name}%")
 
         if category:
             query += " AND category = %s"
@@ -45,20 +41,20 @@ def list_items(limit=50, offset=0, search=None, name=None, category=None, min_pr
             query += " AND rating = %s"
             filters.append(rating)
 
-        if sort:
-            if sort == "popular":
+        if sort_by:
+            if sort_by == "popular":
                 query += " ORDER BY total_projected_qty DESC"
-            elif sort == "newest":
+            elif sort_by == "newest":
                 query += " ORDER BY creation_date DESC"
-            elif sort == "highest_to_lowest":
+            elif sort_by == "highest_to_lowest":
                 query += " ORDER BY new_price DESC" 
-            elif sort == "lowest_to_highest":
+            elif sort_by == "lowest_to_highest":
                 query += " ORDER BY new_price ASC"
         else:
             query += " ORDER BY product_name ASC"
 
         query += " LIMIT %s OFFSET %s"
-        filters.extend([limit, offset])
+        filters.extend([limit])
 
         items = frappe.db.sql(query, filters, as_dict=True)
 
@@ -72,7 +68,6 @@ def list_items(limit=50, offset=0, search=None, name=None, category=None, min_pr
     except Exception as e:
         frappe.log_error(message=str(e), title="Error fetching items")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
 
 
 

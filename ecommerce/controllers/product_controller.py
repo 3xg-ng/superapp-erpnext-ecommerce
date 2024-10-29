@@ -4,7 +4,7 @@ from ecommerce.services.product_service import list_items, list_items_category, 
     
 @frappe.whitelist(allow_guest=True)
 def get_all_items():
-    return list_items()
+    return list_items(color=, )
 
 
 @frappe.whitelist(allow_guest=True)
