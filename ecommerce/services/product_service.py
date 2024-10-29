@@ -484,12 +484,12 @@ def list_items_best_seller(limit=50, offset=0, search=None, category=None, min_p
 
 
 ### Get single item by code
-def get_item_by_code(product_id):
+def get_item_by_code(item_code):
     try:
-        item = frappe.get_doc("Products", {"product_id": product_id})
+        item = frappe.get_doc("Products", {"item_code": item_code})
 
         if not item:
-            raise frappe.DoesNotExistError(f"Item with code {product_id} not found!")
+            raise frappe.DoesNotExistError(f"Item with code {item_code} not found!")
 
         return create_response(SUCCESS, item.as_dict())
 
@@ -506,7 +506,7 @@ def get_item_by_code(product_id):
 def add_new_item(item_code, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty):
     
     try:
-        if frappe.db.exists("Item", {"item_code": item_code}):
+        if frappe.db.exists("Products", {"item_code": item_code}):
             raise ValueError(f"Item with code '{item_code}' already exists!")
 
         new_item = frappe.get_doc({
