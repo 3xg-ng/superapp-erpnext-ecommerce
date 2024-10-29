@@ -484,12 +484,12 @@ def list_items_best_seller(limit=50, offset=0, search=None, category=None, min_p
 
 
 ### Get single item by code
-def get_item_by_code(item_code):
+def get_item_by_code(product_id):
     try:
-        item = frappe.get_doc("Products", {"item_code": item_code})
+        item = frappe.get_doc("Products", {"product_id": product_id})
 
         if not item:
-            raise frappe.DoesNotExistError(f"Item with code {item_code} not found!")
+            raise frappe.DoesNotExistError(f"Item with code {product_id} not found!")
 
         return create_response(SUCCESS, item.as_dict())
 
