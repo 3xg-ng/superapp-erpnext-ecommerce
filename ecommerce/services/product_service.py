@@ -3,7 +3,7 @@ from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR
 from ecommerce.utils.response_helper import create_response
 
 ### Get all items
-def list_items(limit=50, offset=0, search=None, name=None, category=None, min_price=None, max_price=None, color=None, brand=None, rating=None, sort=None):
+def list_items():
     try:
         query = """
             SELECT product_name, old_price, new_price, image, rating
@@ -11,56 +11,8 @@ def list_items(limit=50, offset=0, search=None, name=None, category=None, min_pr
             WHERE 1=1
         """
         
-        filters = []
-        
-        if search:
-            query += " AND (product_name LIKE %s OR description LIKE %s)"
-            filters.extend([f"%{search}%", f"%{search}%"])
 
-        if name:
-            query += " AND (product_name LIKE %s)"
-            filters.append(f"{name}%")
-
-        if category:
-            query += " AND category = %s"
-            filters.append(category)
-
-        if min_price is not None:
-            query += " AND new_price >= %s"
-            filters.append(min_price)
-        
-        if max_price is not None:
-            query += " AND new_price <= %s"
-            filters.append(max_price)
-
-        if color:
-            query += " AND color = %s"
-            filters.append(color)
-
-        if brand:
-            query += " AND brand = %s"
-            filters.append(brand)
-            
-        if rating:
-            query += " AND rating = %s"
-            filters.append(rating)
-
-        if sort:
-            if sort == "popular":
-                query += " ORDER BY total_projected_qty DESC"
-            elif sort == "newest":
-                query += " ORDER BY creation_date DESC"
-            elif sort == "highest_to_lowest":
-                query += " ORDER BY new_price DESC" 
-            elif sort == "lowest_to_highest":
-                query += " ORDER BY new_price ASC"
-        else:
-            query += " ORDER BY product_name ASC"
-
-        query += " LIMIT %s OFFSET %s"
-        filters.extend([limit, offset])
-
-        items = frappe.db.sql(query, filters, as_dict=True)
+        items = frappe.db.sql(query, as_dict=True)
 
         if not items:
             raise frappe.DoesNotExistError("No items found!")

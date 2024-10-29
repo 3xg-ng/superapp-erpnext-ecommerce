@@ -1,6 +1,6 @@
 import frappe
 
-from ecommerce.services.product_service import list_items, list_items_category, list_items_smartphone, list_items_accessories, list_items_laptops, list_items_home_appliance, list_items_kiddies, list_items_new_arrival, list_items_best_seller, list_items_official_store, get_product_by_id, add_new_item, update_item_by_code, delete_item_by_code
+from ecommerce.services.product_service import list_items, list_items_category, list_items_smartphone, list_items_accessories, list_items_laptops, list_items_home_appliance, list_items_kiddies, list_items_new_arrival, list_items_best_seller, list_items_official_store, get_item_by_code, add_new_item, update_item_by_code, delete_item_by_code
     
 @frappe.whitelist(allow_guest=True)
 def get_all_items():
@@ -54,7 +54,7 @@ def get_all_items_by_official_store():
 
 @frappe.whitelist(allow_guest=True)
 def get_single_item(product_id):
-    return get_product_by_id(product_id)
+    return get_item_by_code(product_id)
 
 @frappe.whitelist(allow_guest=True)
 def add_item(product_id, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty):
