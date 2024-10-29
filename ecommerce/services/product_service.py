@@ -3,7 +3,7 @@ from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR
 from ecommerce.utils.response_helper import create_response
 
 ### Get all items
-def list_items(limit=50, product_name=None, category=None, min_price=None, max_price=None, color=None, brand=None, rating=None, sort_by=None, sort_order="ASC")):
+def list_items(limit=50, product_name=None, category=None, min_price=None, max_price=None, color=None, brand=None, rating=None, sort_by=None, sort_order="ASC"):
     try:
         query = """
             SELECT *
