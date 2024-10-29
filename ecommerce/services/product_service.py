@@ -1,5 +1,5 @@
 import frappe
-from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR, BAD_REQUEST
+from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR
 from ecommerce.utils.response_helper import create_response
 
 ### Get all items
@@ -72,6 +72,7 @@ def list_items(limit=50, offset=0, search=None, name=None, category=None, min_pr
     except Exception as e:
         frappe.log_error(message=str(e), title="Error fetching items")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
 
 
 
@@ -531,42 +532,26 @@ def list_items_best_seller(limit=50, offset=0, search=None, category=None, min_p
 
 
 ### Get single item by code
-def get_product_by_id():
+def get_item_by_code(product_id):
     try:
-        # Log form_dict to inspect received parameters
-        frappe.log_error(message=f"form_dict content: {frappe.form_dict}", title="Debug: form_dict Inspection")
-
-        # Retrieve the product_id from request parameters or JSON body
-        product_id = frappe.form_dict.get("product_id")
-
-        if not product_id:
-            raise ValueError("Product ID is required.")
-
-        # Define the SQL query to fetch a product by its ID
         query = """
             SELECT *
             FROM `tabProducts`
             WHERE product_id = %s
         """
+        
+        item = frappe.db.sql(query, [product_id], as_dict=True)
 
-        # Execute the query with product_id as a parameter
-        product = frappe.db.sql(query, (product_id,), as_dict=True)
+        if not item:
+            raise frappe.DoesNotExistError(f"Item with code {product_id} not found!")
 
-        if not product:
-            raise frappe.DoesNotExistError(f"Product with ID {product_id} not found!")
-
-        return create_response(SUCCESS, product[0])
+        return create_response(SUCCESS, item[0])
 
     except frappe.DoesNotExistError as e:
         return create_response(NOT_FOUND, str(e))
-    except ValueError as e:
-        return create_response(BAD_REQUEST, str(e))
     except Exception as e:
-        frappe.log_error(message=str(e), title="Error fetching product by ID")
+        frappe.log_error(message=str(e), title="Error fetching single item")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
-
-
 
 
 
