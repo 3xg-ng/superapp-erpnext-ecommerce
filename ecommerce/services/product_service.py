@@ -536,7 +536,7 @@ def get_product_by_id():
         # Log form_dict to inspect received parameters
         frappe.log_error(message=f"form_dict content: {frappe.form_dict}", title="Debug: form_dict Inspection")
 
-        # Retrieve the product_id from request parameters using frappe.form_dict
+        # Retrieve the product_id from request parameters or JSON body
         product_id = frappe.form_dict.get("product_id")
 
         if not product_id:
