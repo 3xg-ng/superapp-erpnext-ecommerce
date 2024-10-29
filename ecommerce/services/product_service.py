@@ -3,7 +3,7 @@ from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR
 from ecommerce.utils.response_helper import create_response
 
 ### Get all items
-def list_items(limit=50, product_name=None, category=None, min_price=None, max_price=None, color=None, brand=None, rating=None, sort=None):
+def list_items(limit=50, offset=0, search=None, name=None, category=None, min_price=None, max_price=None, color=None, brand=None, rating=None, sort=None):
     try:
         query = """
             SELECT *
@@ -13,9 +13,13 @@ def list_items(limit=50, product_name=None, category=None, min_price=None, max_p
         
         filters = []
         
-        if product_name:
-            query += " AND product_name LIKE %s"
-            filters.append(f"%{product_name}%")
+        if search:
+            query += " AND (product_name LIKE %s OR description LIKE %s)"
+            filters.extend([f"%{search}%", f"%{search}%"])
+
+        if name:
+            query += " AND (product_name LIKE %s)"
+            filters.append(f"{name}%")
 
         if category:
             query += " AND category = %s"
@@ -54,7 +58,7 @@ def list_items(limit=50, product_name=None, category=None, min_price=None, max_p
             query += " ORDER BY product_name ASC"
 
         query += " LIMIT %s OFFSET %s"
-        filters.extend([limit])
+        filters.extend([limit, offset])
 
         items = frappe.db.sql(query, filters, as_dict=True)
 
