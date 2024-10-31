@@ -7,7 +7,7 @@ def list_cart_items(user_id):
     
     try:
         cart_items = frappe.db.sql("""
-            SELECT product_id, product_name, quantity
+            SELECT item_code, product_name, quantity
             FROM `tabCart`
             WHERE user_id = %s
         """, (user_id,), as_dict=True)
@@ -22,68 +22,68 @@ def list_cart_items(user_id):
         return create_response(SERVER_ERROR, f"An unexpected error occurred while fetching cart items: {str(e)}")
 
 ### Function to Add Item to Cart
-def add_to_cart(user_id, product_id, product_name, quantity=1):
+def add_to_cart(user_id, item_code, product_name, quantity=1):
     
     try:
         # Check if the item already exists in the user's cart
-        cart_item = frappe.db.get_value("Cart", {"user_id": user_id, "product_id": product_id}, "quantity")
+        cart_item = frappe.db.get_value("Cart", {"user_id": user_id, "item_code": item_code}, "quantity")
 
         if cart_item:
             # Update the quantity of the existing item
             frappe.db.sql("""
                 UPDATE `tabCart`
                 SET quantity = quantity + %s
-                WHERE user_id = %s AND product_id = %s
-            """, (quantity, user_id, product_id))
+                WHERE user_id = %s AND item_code = %s
+            """, (quantity, user_id, item_code))
         else:
             # Insert a new item into the cart
             new_cart_item = frappe.get_doc({
                 "doctype": "Cart",
                 "user_id": user_id,
-                "item_code": product_id,
+                "item_code": item_code,
                 "product_name": product_name,
                 "quantity": quantity
             })
             new_cart_item.insert()
 
         frappe.db.commit()
-        return create_response(SUCCESS, f"Item {product_id} added to cart successfully!")
+        return create_response(SUCCESS, f"Item {item_code} added to cart successfully!")
 
     except frappe.DuplicateEntryError:
         return create_response(SERVER_ERROR, "Duplicate entry found. Please try again.")
     except Exception as e:
-        frappe.log_error(f"Error adding item {product_id} to cart for user {user_id}: {str(e)}", "Add to Cart Error")
+        frappe.log_error(f"Error adding item {item_code} to cart for user {user_id}: {str(e)}", "Add to Cart Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred while adding the item: {str(e)}")
 
 
-def update_cart_quantity(user_id, product_id, quantity):
+def update_cart_quantity(user_id, item_code, quantity):
     
     try:
-        cart_item = frappe.db.get_value("Cart", {"user_id": user_id, "product_id": product_id}, "quantity")
+        cart_item = frappe.db.get_value("Cart", {"user_id": user_id, "item_code": item_code}, "quantity")
 
         if not cart_item:
-            return create_response(NOT_FOUND, f"Item {product_id} not found in the cart.")
+            return create_response(NOT_FOUND, f"Item {item_code} not found in the cart.")
 
         if quantity == 0:
             frappe.db.sql("""
                 DELETE FROM `tabCart`
-                WHERE user_id = %s AND product_id = %s
-            """, (user_id, product_id))
-            message = f"Item {product_id} removed from the cart."
+                WHERE user_id = %s AND item_code = %s
+            """, (user_id, item_code))
+            message = f"Item {item_code} removed from the cart."
         else:
             # Update the item quantity in the cart
             frappe.db.sql("""
                 UPDATE `tabCart`
                 SET quantity = %s
-                WHERE user_id = %s AND product_id = %s
-            """, (quantity, user_id, product_id))
-            message = f"Quantity of item {product_id} updated to {quantity}."
+                WHERE user_id = %s AND item_code = %s
+            """, (quantity, user_id, item_code))
+            message = f"Quantity of item {item_code} updated to {quantity}."
 
         frappe.db.commit()
         return create_response(SUCCESS, message)
 
     except Exception as e:
-        frappe.log_error(f"Error updating cart item {product_id} for user {user_id}: {str(e)}", "Update Cart Error")
+        frappe.log_error(f"Error updating cart item {item_code} for user {user_id}: {str(e)}", "Update Cart Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred while updating the cart item: {str(e)}")
 
 ### Function to Delete Cart
