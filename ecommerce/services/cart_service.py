@@ -34,7 +34,6 @@ def add_to_cart(user_id, item_code, product_name, image, seller_name, quantity=1
                 WHERE user_id = %s AND item_code = %s
             """, (quantity, user_id, item_code))
         else:
-            # Insert a new item into the cart
             new_cart_item = frappe.get_doc({
                 "doctype": "Cart",
                 "user_id": user_id,
