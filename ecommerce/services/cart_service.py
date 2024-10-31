@@ -22,14 +22,12 @@ def list_cart_items(user_id):
         return create_response(SERVER_ERROR, f"An unexpected error occurred while fetching cart items: {str(e)}")
 
 ### Function to Add Item to Cart
-def add_to_cart(user_id, item_code, product_name, quantity=1):
+def add_to_cart(user_id, item_code, product_name, image, seller_name, quantity=1):
     
     try:
-        # Check if the item already exists in the user's cart
         cart_item = frappe.db.get_value("Cart", {"user_id": user_id, "item_code": item_code}, "quantity")
 
         if cart_item:
-            # Update the quantity of the existing item
             frappe.db.sql("""
                 UPDATE `tabCart`
                 SET quantity = quantity + %s
@@ -42,6 +40,8 @@ def add_to_cart(user_id, item_code, product_name, quantity=1):
                 "user_id": user_id,
                 "item_code": item_code,
                 "product_name": product_name,
+                "image": image,
+                "seller_name": seller_name,
                 "quantity": quantity
             })
             new_cart_item.insert()
