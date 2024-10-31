@@ -7,12 +7,12 @@ def get_cart(user_id):
     return list_cart_items(user_id)
 
 @frappe.whitelist(allow_guest=True)
-def add_item_to_cart(user_id, item_id, item_name, quantity=1):
-    return add_to_cart(user_id, item_id, item_name, quantity)
+def add_item_to_cart(user_id, item_code, product_name, image, seller_name, quantity):
+    return add_to_cart(user_id, item_code, product_name, image, seller_name, quantity)
 
 @frappe.whitelist(allow_guest=True)
-def add_item_to_cart(user_id, item_id, item_name, quantity=1):
-    return update_cart_quantity(user_id, item_id, quantity)
+def update_cart_item(user_id, item_code, product_name, image, seller_name, quantity):
+    return update_cart_quantity(user_id, item_code, product_name, image, seller_name, quantity)
 
 @frappe.whitelist(allow_guest=True)
 def clear_cart(user_id):
