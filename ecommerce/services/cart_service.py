@@ -4,7 +4,6 @@ from ecommerce.utils.response_helper import create_response
 
 ### Function to List Cart Items
 def list_cart_items(user_id):
-    
     try:
         query = """
             SELECT *
@@ -12,8 +11,7 @@ def list_cart_items(user_id):
             WHERE user_id=%s
         """
         
-
-        cart_items = frappe.db.sql(query, as_dict=True)
+        cart_items = frappe.db.sql(query, (user_id,), as_dict=True)
 
         if not cart_items:
             return create_response(NOT_FOUND, "Cart is empty!")
@@ -21,8 +19,10 @@ def list_cart_items(user_id):
         return create_response(SUCCESS, cart_items)
 
     except Exception as e:
-        frappe.log_error(f"Error listing cart items for user {user_id}: {str(e)}", "Cart Listing Error")
-        return create_response(SERVER_ERROR, f"An unexpected error occurred while fetching cart items: {str(e)}")
+        error_message = f"Error listing cart items for user {user_id}: {str(e)}"
+        frappe.log_error(error_message, "Cart Listing Error")
+        return create_response(SERVER_ERROR, f"An unexpected error occurred while fetching cart items.")
+
 
 ### Function to Add Item to Cart
 def add_to_cart(user_id, item_code, product_name, image, seller_name, price, quantity):
