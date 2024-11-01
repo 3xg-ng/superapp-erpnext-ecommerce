@@ -7,7 +7,7 @@ def list_cart_items(user_id):
     
     try:
         cart_items = frappe.db.sql("""
-            SELECT product_name, image, seller_name, price, quantity
+            SELECT *
             FROM `tabCart`
             WHERE user_id = %s
         """, (user_id,), as_dict=True)
