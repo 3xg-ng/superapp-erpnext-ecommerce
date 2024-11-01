@@ -28,16 +28,17 @@ def list_cart_items():
 
 ### Function to Add Item to Cart
 def add_to_cart(user_id, item_code, product_name, image, seller_name, price, quantity):
-    
     try:
-        cart_item = frappe.db.get_value("Cart", {"user_id": user_id, "item_code": item_code}, "quantity")
+        cart_item = frappe.db.get_value("Cart", {"user_id": user_id, "item_code": item_code}, ["quantity", "name"])
 
         if cart_item:
+            updated_quantity = cart_item[0] + quantity
             frappe.db.sql("""
                 UPDATE `tabCart`
-                SET quantity = quantity + %s
-                WHERE user_id = %s AND item_code = %s
-            """, (quantity, user_id, item_code))
+                SET quantity = %s
+                WHERE name = %s
+            """, (updated_quantity, cart_item[1]))
+
         else:
             new_cart_item = frappe.get_doc({
                 "doctype": "Cart",
@@ -59,6 +60,7 @@ def add_to_cart(user_id, item_code, product_name, image, seller_name, price, qua
     except Exception as e:
         frappe.log_error(f"Error adding item {item_code} to cart for user {user_id}: {str(e)}", "Add to Cart Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred while adding the item: {str(e)}")
+
 
 
 def update_cart_quantity(user_id, item_code, quantity):
