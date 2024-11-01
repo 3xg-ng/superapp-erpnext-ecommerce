@@ -6,11 +6,14 @@ from ecommerce.utils.response_helper import create_response
 def list_cart_items(user_id):
     
     try:
-        cart_items = frappe.db.sql("""
+        query = """
             SELECT *
             FROM `tabCart`
-            WHERE user_id = %s
-        """, (user_id,), as_dict=True)
+            WHERE 1=1
+        """
+        
+
+        cart_items = frappe.db.sql(query, as_dict=True)
 
         if not cart_items:
             return create_response(NOT_FOUND, "Cart is empty!")
