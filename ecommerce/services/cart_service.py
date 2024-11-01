@@ -3,25 +3,27 @@ from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR
 from ecommerce.utils.response_helper import create_response
 
 ### Function to List Cart Items
-def list_cart_items(user_id):
+def list_cart_items():
     try:
         query = """
             SELECT *
             FROM `tabCart`
-            WHERE user_id=%s
+            WHERE 1=1
         """
         
-        cart_items = frappe.db.sql(query, (user_id,), as_dict=True)
 
-        if not cart_items:
-            return create_response(NOT_FOUND, "Cart is empty!")
+        items = frappe.db.sql(query, as_dict=True)
 
-        return create_response(SUCCESS, cart_items)
+        if not items:
+            raise frappe.DoesNotExistError("No items found!")
 
+        return create_response(SUCCESS, items)
+
+    except frappe.DoesNotExistError as e:
+        return create_response(NOT_FOUND, str(e))
     except Exception as e:
-        error_message = f"Error listing cart items for user {user_id}: {str(e)}"
-        frappe.log_error(error_message, "Cart Listing Error")
-        return create_response(SERVER_ERROR, f"An unexpected error occurred while fetching cart items.")
+        frappe.log_error(message=str(e), title="Error fetching items")
+        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 
 ### Function to Add Item to Cart

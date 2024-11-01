@@ -3,8 +3,8 @@ import frappe
 from ecommerce.services.cart_service import list_cart_items, add_to_cart, update_cart_quantity, delete_cart
 
 @frappe.whitelist(allow_guest=True)
-def get_cart(user_id):
-    return list_cart_items(user_id)
+def get_cart():
+    return list_cart_items()
 
 @frappe.whitelist(allow_guest=True)
 def add_item_to_cart(user_id, item_code, product_name, image, seller_name, price, quantity):
