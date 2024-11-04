@@ -27,31 +27,24 @@ def list_cart_items():
 
 
 ### Function to Add Item to Cart
-def add_to_cart(user_id, item_code, product_name, image, seller_name, price, quantity):
+def add_to_cart(user_id, item_code):
     try:
         cart_item = frappe.db.get_value("Cart", {"user_id": user_id, "item_code": item_code}, ["quantity", "name"])
 
         if cart_item:
-            updated_quantity = cart_item[0] + quantity
-            frappe.db.sql("""
-                UPDATE `tabCart`
-                SET quantity = %s
-                WHERE name = %s
-            """, (updated_quantity, cart_item[1]))
-
+            cart_doc = frappe.get_doc("Cart", cart_item["name"])
+            cart_doc.quantity += 1
+            cart_doc.save()
         else:
             new_cart_item = frappe.get_doc({
                 "doctype": "Cart",
                 "user_id": user_id,
                 "item_code": item_code,
-                "product_name": product_name,
-                "image": image,
-                "seller_name": seller_name,
-                "price": price,
-                "quantity": quantity
+                "quantity": 1
             })
             new_cart_item.insert()
 
+        # Commit the transaction
         frappe.db.commit()
         return create_response(SUCCESS, f"Item {item_code} added to cart successfully!")
 
