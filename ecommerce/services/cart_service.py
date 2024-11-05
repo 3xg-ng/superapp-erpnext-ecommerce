@@ -3,15 +3,15 @@ from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR
 from ecommerce.utils.response_helper import create_response
 
 ### Function to List Cart Items
-def list_cart_items(user_id):
+def list_cart_items():
     try:
         query = """
             SELECT *
             FROM `tabCart`
-            WHERE user_id = %s
+            WHERE 1=1
         """
         
-        items = frappe.db.sql(query, user_id, as_dict=True)
+        items = frappe.db.sql(query, as_dict=True)
 
         if not items:
             raise frappe.DoesNotExistError("No items found for this user!")
