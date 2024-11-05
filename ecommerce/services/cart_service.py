@@ -57,18 +57,21 @@ def add_to_cart(user_id, item_code):
 
 def update_cart_quantity(user_id, item_code, quantity):
     try:
+        frappe.log_error(f"Starting quantity update for user {user_id} and item {item_code}.")
         cart_item = frappe.db.get_value("Cart", {"user_id": user_id, "item_code": item_code}, "quantity")
 
-        if cart_item is None:
+        if not cart_item:
             return create_response(NOT_FOUND, f"Item {item_code} not found in the cart.")
 
         if quantity == 0:
+            frappe.log_error(f"Deleting item {item_code} for user {user_id}.")
             frappe.db.sql("""
                 DELETE FROM `tabCart`
                 WHERE user_id = %s AND item_code = %s
             """, (user_id, item_code))
             message = f"Item {item_code} removed from the cart."
         else:
+            frappe.log_error(f"Updating item {item_code} to quantity {quantity} for user {user_id}.")
             frappe.db.sql("""
                 UPDATE `tabCart`
                 SET quantity = %s
@@ -77,12 +80,13 @@ def update_cart_quantity(user_id, item_code, quantity):
             message = f"Quantity of item {item_code} updated to {quantity}."
 
         frappe.db.commit()
+        frappe.log_error(f"Quantity update successful for user {user_id} and item {item_code}.")
         return create_response(SUCCESS, message)
 
     except Exception as e:
-        # Improved error logging with traceback
-        frappe.log_error(f"Error updating cart item {item_code} for user {user_id}: {str(e)}", "Update Cart Error")
-        return create_response(SERVER_ERROR, "An unexpected error occurred while updating the cart item.")
+        frappe.log_error(f"Error updating quantity for item {item_code} in user {user_id}'s cart: {str(e)}", "Update Cart Quantity Error")
+        return create_response(SERVER_ERROR, f"An unexpected error occurred while updating the cart item: {str(e)}")
+
 
 
 ### Function to Delete Cart
