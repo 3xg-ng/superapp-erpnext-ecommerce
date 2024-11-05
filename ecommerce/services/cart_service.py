@@ -71,7 +71,6 @@ def update_cart_quantity(user_id, item_code, quantity):
             """, (user_id, item_code))
             message = f"Item {item_code} removed from the cart."
         else:
-            # Update the item quantity in the cart
             frappe.db.sql("""
                 UPDATE `tabCart`
                 SET quantity = %s
@@ -87,21 +86,34 @@ def update_cart_quantity(user_id, item_code, quantity):
         return create_response(SERVER_ERROR, f"An unexpected error occurred while updating the cart item: {str(e)}")
 
 ### Function to Delete Cart
-def delete_cart(user_id):
-    
+def delete_cart(user_id, item_code=None):
     try:
-        if not frappe.db.exists("Cart", {"user_id": user_id}):
-            return create_response(NOT_FOUND, "Cart not found!")
+        if item_code:
+            if not frappe.db.exists("Cart", {"user_id": user_id, "item_code": item_code}):
+                return create_response(NOT_FOUND, f"Item {item_code} not found in cart for user {user_id}.")
+        else:
+            if not frappe.db.exists("Cart", {"user_id": user_id}):
+                return create_response(NOT_FOUND, f"Cart not found for user {user_id}.")
 
-        # Delete the user's cart
-        frappe.db.sql("""
-            DELETE FROM `tabCart`
-            WHERE user_id = %s
-        """, (user_id,))
+        if item_code:
+            frappe.db.sql("""
+                DELETE FROM `tabCart`
+                WHERE user_id = %s AND item_code = %s
+            """, (user_id, item_code))
+            message = f"Item {item_code} deleted from cart for user {user_id}."
+        else:
+            frappe.db.sql("""
+                DELETE FROM `tabCart`
+                WHERE user_id = %s
+            """, (user_id,))
+            message = f"Cart for user {user_id} deleted successfully!"
 
         frappe.db.commit()
-        return create_response(SUCCESS, f"Cart for user {user_id} deleted successfully!")
+        return create_response(SUCCESS, message)
 
+    except frappe.DoesNotExistError as e:
+        frappe.log_error(f"Item or cart does not exist: {str(e)}", "Delete Cart Error")
+        return create_response(NOT_FOUND, "Cart item or cart does not exist.")
     except Exception as e:
-        frappe.log_error(f"Error deleting cart for user {user_id}: {str(e)}", "Delete Cart Error")
-        return create_response(SERVER_ERROR, f"An unexpected error occurred while deleting the cart: {str(e)}")
+        frappe.log_error(f"Error deleting cart or item for user {user_id}: {str(e)}", "Delete Cart Error")
+        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
