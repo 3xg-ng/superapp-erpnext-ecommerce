@@ -4,7 +4,7 @@ from ecommerce.services.cart_service import list_cart_items, add_to_cart, update
 
 @frappe.whitelist(allow_guest=True)
 def get_cart(user_id):
-    return list_cart_items(user_id=user_id)
+    return list_cart_items(user_id)
 
 
 @frappe.whitelist(allow_guest=True)
