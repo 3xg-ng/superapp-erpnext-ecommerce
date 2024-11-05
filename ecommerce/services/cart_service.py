@@ -45,7 +45,6 @@ def add_to_cart(user_id, item_code):
             })
             new_cart_item.insert()
 
-        # Commit the transaction
         frappe.db.commit()
         return create_response(SUCCESS, f"Item {item_code} added to cart successfully!")
 
@@ -54,7 +53,6 @@ def add_to_cart(user_id, item_code):
     except Exception as e:
         frappe.log_error(f"Error adding item {item_code} to cart for user {user_id}: {str(e)}", "Add to Cart Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred while adding the item: {str(e)}")
-
 
 
 
