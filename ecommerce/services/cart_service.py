@@ -14,7 +14,7 @@ def list_cart_items():
         items = frappe.db.sql(query, as_dict=True)
 
         if not items:
-            raise frappe.DoesNotExistError("No items found for this user!")
+            raise frappe.DoesNotExistError("No cart items found for this user!")
 
         return create_response(SUCCESS, items)
 
