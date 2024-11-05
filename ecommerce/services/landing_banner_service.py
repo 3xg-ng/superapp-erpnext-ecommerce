@@ -31,7 +31,7 @@ def get_banner_b():
     try:
         query = """
             SELECT *
-            FROM `tabBannerC`
+            FROM `tabBannerB`
             WHERE 1=1
         """
          
