@@ -8,7 +8,7 @@ def list_cart_items():
         query = """
             SELECT *
             FROM `tabCart`
-            WHERE 1=1
+            WHERE user_id=%s
         """
         
 
