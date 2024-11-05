@@ -55,13 +55,11 @@ def add_to_cart(user_id, item_code):
         return create_response(SERVER_ERROR, f"An unexpected error occurred while adding the item: {str(e)}")
 
 
-
 def update_cart_quantity(user_id, item_code, quantity):
-    
     try:
         cart_item = frappe.db.get_value("Cart", {"user_id": user_id, "item_code": item_code}, "quantity")
 
-        if not cart_item:
+        if cart_item is None:
             return create_response(NOT_FOUND, f"Item {item_code} not found in the cart.")
 
         if quantity == 0:
@@ -82,8 +80,10 @@ def update_cart_quantity(user_id, item_code, quantity):
         return create_response(SUCCESS, message)
 
     except Exception as e:
+        # Improved error logging with traceback
         frappe.log_error(f"Error updating cart item {item_code} for user {user_id}: {str(e)}", "Update Cart Error")
-        return create_response(SERVER_ERROR, f"An unexpected error occurred while updating the cart item: {str(e)}")
+        return create_response(SERVER_ERROR, "An unexpected error occurred while updating the cart item.")
+
 
 ### Function to Delete Cart
 def delete_cart(user_id, item_code=None):
