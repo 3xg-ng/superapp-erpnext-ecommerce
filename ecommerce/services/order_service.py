@@ -47,7 +47,7 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
 
         sales_order = frappe.get_doc({
             "doctype": "Sales Order",
-            "shipping_address_name": shipping_address,
+            "shipping_address": shipping_address,
             "lga": lga,
             "shipping_address_postal_code": post_code,
             "net_total": subtotal,
