@@ -55,37 +55,34 @@ def add_to_cart(user_id, item_code):
         return create_response(SERVER_ERROR, f"An unexpected error occurred while adding the item: {str(e)}")
 
 
-def update_cart_quantity(user_id, item_code, quantity):
+def update_cart_quantity(user_id, item_id, quantity):
     try:
-        frappe.log_error(f"Starting quantity update for user {user_id} and item {item_code}.")
-        cart_item = frappe.db.get_value("Cart", {"user_id": user_id, "item_code": item_code}, "quantity")
+        query_check = """
+            SELECT *
+            FROM `tabCart`
+            WHERE user_id = %s AND item_id = %s
+        """
+        item = frappe.db.sql(query_check, (user_id, item_id), as_dict=True)
 
-        if not cart_item:
-            return create_response(NOT_FOUND, f"Item {item_code} not found in the cart.")
+        if not item:
+            raise frappe.DoesNotExistError("Item not found in the cart for this user!")
 
-        if quantity == 0:
-            frappe.log_error(f"Deleting item {item_code} for user {user_id}.")
-            frappe.db.sql("""
-                DELETE FROM `tabCart`
-                WHERE user_id = %s AND item_code = %s
-            """, (user_id, item_code))
-            message = f"Item {item_code} removed from the cart."
-        else:
-            frappe.log_error(f"Updating item {item_code} to quantity {quantity} for user {user_id}.")
-            frappe.db.sql("""
-                UPDATE `tabCart`
-                SET quantity = %s
-                WHERE user_id = %s AND item_code = %s
-            """, (quantity, user_id, item_code))
-            message = f"Quantity of item {item_code} updated to {quantity}."
-
+        query_update = """
+            UPDATE `tabCart`
+            SET quantity = %s
+            WHERE user_id = %s AND item_id = %s
+        """
+        frappe.db.sql(query_update, (quantity, user_id, item_id))
         frappe.db.commit()
-        frappe.log_error(f"Quantity update successful for user {user_id} and item {item_code}.")
-        return create_response(SUCCESS, message)
 
+        return create_response(SUCCESS, "Quantity updated successfully.")
+
+    except frappe.DoesNotExistError as e:
+        return create_response(NOT_FOUND, str(e))
     except Exception as e:
-        frappe.log_error(f"Error updating quantity for item {item_code} in user {user_id}'s cart: {str(e)}", "Update Cart Quantity Error")
-        return create_response(SERVER_ERROR, f"An unexpected error occurred while updating the cart item: {str(e)}")
+        frappe.log_error(message=str(e), title="Error updating cart quantity")
+        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
 
 
 
