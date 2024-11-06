@@ -34,11 +34,11 @@ def list_orders(user_id):
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 ### Function to Create a New Order
-def create_order(seller_name, shipping_address, lga, post_code, subtotal, shipping_fee, discount, total, payment_method, user_id, status):
+def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, discount, total, payment_method, user_id, status):
     try:
         cart_items = frappe.db.sql("""
             SELECT item_code, quantity, price
-            FROM `tabCart Item`
+            FROM `tabCart`
             WHERE user_id = %s
         """, (user_id,), as_dict=True)
 
@@ -47,7 +47,6 @@ def create_order(seller_name, shipping_address, lga, post_code, subtotal, shippi
 
         sales_order = frappe.get_doc({
             "doctype": "Sales Order",
-            "customer": seller_name,
             "shipping_address_name": shipping_address,
             "lga": lga,
             "shipping_address_postal_code": post_code,
@@ -70,7 +69,8 @@ def create_order(seller_name, shipping_address, lga, post_code, subtotal, shippi
                 "parentfield": "items",
                 "item_code": item["item_code"],
                 "quantity": item.get("quantity", 1),
-                "price": item["price"]
+                "price": item["price"],
+                "seller_name": item["seller_name"]
             }).insert(ignore_permissions=True)
 
         frappe.db.commit()
