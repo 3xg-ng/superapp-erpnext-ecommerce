@@ -69,7 +69,7 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
                 "parentfield": "items",
                 "item_code": item["item_code"],
                 "quantity": item.get("quantity", 1),
-                "rate": item["price"],
+                "price": item["price"],
                 "seller_name": item["seller_name"]
             }).insert()
 
