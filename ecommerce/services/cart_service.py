@@ -55,14 +55,14 @@ def add_to_cart(user_id, item_code):
         return create_response(SERVER_ERROR, f"An unexpected error occurred while adding the item: {str(e)}")
 
 
-def update_cart_quantity(user_id, item_id, quantity):
+def update_cart_quantity(user_id, item_code, quantity):
     try:
         query_check = """
             SELECT *
             FROM `tabCart`
-            WHERE user_id = %s AND item_id = %s
+            WHERE user_id = %s AND item_code = %s
         """
-        item = frappe.db.sql(query_check, (user_id, item_id), as_dict=True)
+        item = frappe.db.sql(query_check, (user_id, item_code), as_dict=True)
 
         if not item:
             raise frappe.DoesNotExistError("Item not found in the cart for this user!")
@@ -70,9 +70,9 @@ def update_cart_quantity(user_id, item_id, quantity):
         query_update = """
             UPDATE `tabCart`
             SET quantity = %s
-            WHERE user_id = %s AND item_id = %s
+            WHERE user_id = %s AND item_code = %s
         """
-        frappe.db.sql(query_update, (quantity, user_id, item_id))
+        frappe.db.sql(query_update, (quantity, user_id, item_code))
         frappe.db.commit()
 
         return create_response(SUCCESS, "Quantity updated successfully.")
