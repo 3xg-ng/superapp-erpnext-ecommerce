@@ -37,7 +37,7 @@ def list_orders(user_id):
 def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, discount, total, payment_method, user_id, status):
     try:
         cart_items = frappe.db.sql("""
-            SELECT item_code, quantity, price
+            SELECT item_code, quantity, price, seller_name
             FROM `tabCart`
             WHERE user_id = %s
         """, (user_id,), as_dict=True)
