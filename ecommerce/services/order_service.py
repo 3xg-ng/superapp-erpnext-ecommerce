@@ -62,16 +62,14 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
         order_id = sales_order.name
 
         for item in cart_items:
-            item_quantity = item.get("quantity", 1) or 1
-            item_price = item.get("price", 0.0) or 0.0 
             frappe.get_doc({
                 "doctype": "Sales Order Item",
                 "parent": order_id,
                 "parenttype": "Sales Order",
                 "parentfield": "items",
                 "item_code": item["item_code"],
-                "quantity": item_quantity,
-                "rate": item_price,
+                "quantity": item.get("quantity", 1),
+                "rate": item["price"],
                 "seller_name": item["seller_name"]
             }).insert()
 
