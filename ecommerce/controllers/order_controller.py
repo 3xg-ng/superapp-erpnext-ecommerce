@@ -11,8 +11,8 @@ def get_orders(user_id):
 
 
 @frappe.whitelist(allow_guest=False)
-def create_new_order(user_id, total_price, item_name, quantity):
-    return create_order(user_id, total_price, item_name, quantity)
+def create_new_order(seller_name, order_items, shipping_address, post_code, subtotal, shipping_fee, discount, total, payment_method, user_id):
+    return create_order(seller_name, order_items, shipping_address, post_code, subtotal, shipping_fee, discount, total, payment_method, user_id)
 
 
 @frappe.whitelist(allow_guest=False)

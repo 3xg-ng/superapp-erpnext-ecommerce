@@ -1,5 +1,5 @@
 import frappe
-from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR
+from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR, BAD_REQUEST
 from ecommerce.utils.response_helper import create_response
 from datetime import datetime
 
@@ -34,35 +34,51 @@ def list_orders(user_id):
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 ### Function to Create a New Order
-def create_order(user_id, items, total_price, status="Draft"):
-    
+def create_order(seller_name, order_items, shipping_address, post_code, subtotal, shipping_fee, discount, total, payment_method, user_id):
     try:
-        # Create a new Sales Order document
-        new_order = frappe.get_doc({
+        sales_order = frappe.get_doc({
             "doctype": "Sales Order",
-            "user_id": user_id,
-            "total_price": total_price,
-            "status": status
+            "customer": seller_name,
+            "shipping_address_name": shipping_address,
+            "shipping_address_postal_code": post_code,
+            "net_total": subtotal,
+            "shipping_rule": shipping_fee,
+            "discount_amount": discount,
+            "grand_total": total,
+            "payment_terms_template": payment_method,
+            "user_id": user_id
         })
-        
-        # Add items to the order
-        for item in items:
-            new_order.append("items", {
+        sales_order.insert(ignore_permissions=True)
+        order_id = sales_order.name 
+
+        for item in order_items:
+            frappe.get_doc({
+                "doctype": "Sales Order Item",
+                "parent": order_id,
+                "parenttype": "Sales Order",
+                "parentfield": "items",
                 "item_code": item["item_code"],
-                "item_name": item["item_name"],
-                "qty": item["qty"],
+                "qty": item.get("qty", 1),
                 "rate": item["rate"],
                 "amount": item["amount"]
-            })
-        
-        new_order.insert()
+            }).insert(ignore_permissions=True)
+
+        # Commit the transaction
         frappe.db.commit()
 
-        return create_response(SUCCESS, f"Order {new_order.name} created successfully!")
+        # Return success response with the created order ID
+        return create_response(SUCCESS, {"order_id": order_id})
+
+    except frappe.ValidationError as e:
+        # Handle specific validation errors
+        frappe.log_error(f"Validation error for user {user_id}: {str(e)}", "Order Creation Validation Error")
+        return create_response(BAD_REQUEST, f"Validation error: {str(e)}")
 
     except Exception as e:
-        frappe.log_error(f"Error creating order for user {user_id}: {str(e)}", "Create Order Error")
+        # General error handling
+        frappe.log_error(f"Error creating order for user {user_id}: {str(e)}", "Order Creation Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
 
 
 ### Function to Update an Existing Order
