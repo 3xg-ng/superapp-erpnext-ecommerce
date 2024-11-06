@@ -51,10 +51,10 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
             "lga": lga,
             "shipping_address_postal_code": post_code,
             "net_total": subtotal,
-            "shipping_rule": shipping_fee,
+            "shipping_amount": shipping_fee,
             "discount_amount": discount,
             "grand_total": total,
-            "payment_terms_template": payment_method,
+            "payment_method": payment_method,
             "user_id": user_id,
             "status": status
         })
@@ -69,7 +69,7 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
                 "parentfield": "items",
                 "item_code": item["item_code"],
                 "quantity": item.get("quantity", 1),
-                "price": item["price"],
+                "rate": item["price"],
                 "seller_name": item["seller_name"]
             }).insert()
 
