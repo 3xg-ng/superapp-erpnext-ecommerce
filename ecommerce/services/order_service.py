@@ -36,7 +36,6 @@ def list_orders(user_id):
 ### Function to Create a New Order
 def create_order(seller_name, shipping_address, lga, post_code, subtotal, shipping_fee, discount, total, payment_method, user_id, status):
     try:
-        # Fetch cart items for the user
         cart_items = frappe.db.sql("""
             SELECT item_code, quantity, price
             FROM `tabCart Item`
@@ -46,7 +45,6 @@ def create_order(seller_name, shipping_address, lga, post_code, subtotal, shippi
         if not cart_items:
             return create_response(NOT_FOUND, "Cart is empty")
 
-        # Prepare sales order
         sales_order = frappe.get_doc({
             "doctype": "Sales Order",
             "customer": seller_name,
