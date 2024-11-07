@@ -58,20 +58,24 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
             "user_id": user_id,
             "status": status
         })
+
         order_id = sales_order.name
 
         for item in cart_items:
+            frappe.log_error(f"Processing cart item: {item}", "Order Creation Debug")
+
             new_item = frappe.get_doc({
                 "doctype": "Order Item",
-                "parent": order_id,
+                "parent": order_id,        
                 "parenttype": "Order",
                 "parentfield": "item",
-                "item_code": item["item_code"],
-                "quantity": item["quantity"],
-                "price": item["price"],
-                "seller_name": item["seller_name"]
-            }).insert()
-
+                "item_code": item.get("item_code"),
+                "quantity": item.get("quantity"),
+                "price": item.get("price"),
+                "seller_name": item.get("seller_name")
+            })
+            
+        
         sales_order.insert()
         new_item.insert()
         frappe.db.commit()
