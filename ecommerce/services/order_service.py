@@ -41,6 +41,8 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
             FROM `tabCart`
             WHERE user_id = %s
         """, (user_id,), as_dict=True)
+        
+        print(cart_items)
 
         if not cart_items:
             return create_response(NOT_FOUND, "Cart is empty")
@@ -64,18 +66,18 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
         sales_order.insert()
         order_id = sales_order.name
 
-        for item in cart_items:
-            frappe.log_error(f"Processing cart item: {item}", "Order Creation Debug")
+        for items in cart_items:
+            frappe.log_error(f"Processing cart item: {items}", "Order Creation Debug")
 
             new_item = frappe.get_doc({
                 "doctype": "Sales Order Item",
                 "parent": order_id,
                 "parenttype": "Order",
                 "parentfield": "items",
-                "item_code": item.get("item_code"),
-                "quantity": item.get("quantity"),
-                "price": item.get("price"),
-                "seller_name": item.get("seller_name")
+                "item_code": items.get("item_code"),
+                "quantity": items.get("quantity"),
+                "price": items.get("price"),
+                "seller_name": items.get("seller_name")
             })
             new_item.insert()
 
