@@ -46,13 +46,13 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
             return create_response(NOT_FOUND, "Cart is empty")
 
         sales_order = frappe.get_doc({
-            "doctype": "Order",
+            "doctype": "Sales Order",
             "shipping_address": shipping_address,
             "lga": lga,
-            "post_code": post_code,
+            "shipping_address_postal_code": post_code,
             "net_total": subtotal,
-            "shipping_fee": shipping_fee,
-            "discount": discount,
+            "shipping_amount": shipping_fee,
+            "discount_amount": discount,
             "grand_total": total,
             "payment_method": payment_method,
             "user_id": user_id,
@@ -66,7 +66,7 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
             new_item = frappe.get_doc({
                 "doctype": "Sales Order Item",
                 "parent": order_id,
-                "parenttype": "Order",
+                "parenttype": "Sales Order",
                 "parentfield": "items",
                 "item_code": item["item_code"],
                 "quantity": item["quantity"],
