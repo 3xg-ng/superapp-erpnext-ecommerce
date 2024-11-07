@@ -45,25 +45,28 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
         if not cart_items:
             return create_response(NOT_FOUND, "Cart is empty")
 
-        sales_order = frappe.get_doc({
-            "doctype": "Order",
-            "shipping_address": shipping_address,
-            "lga": lga,
-            "post_code": post_code,
-            "net_total": subtotal,
-            "shipping_fee": shipping_fee,
-            "discount": discount,
-            "grand_total": total,
-            "payment_method": payment_method,
-            "user_id": user_id,
-            "status": status
-        })
+        def create_sales_order():
+            return frappe.get_doc({
+                "doctype": "Order",
+                "shipping_address": shipping_address,
+                "lga": lga,
+                "post_code": post_code,
+                "net_total": subtotal,
+                "shipping_fee": shipping_fee,
+                "discount": discount,
+                "grand_total": total,
+                "payment_method": payment_method,
+                "user_id": user_id,
+                "status": status
+            })
+
+        # Insert Sales Order
+        sales_order = create_sales_order()
         sales_order.insert()
-        frappe.db.commit()
         order_id = sales_order.name
 
-        for item in cart_items:
-            new_item = frappe.get_doc({
+        def create_sales_order_item(item):
+            return frappe.get_doc({
                 "doctype": "Sales Order Item",
                 "parent": order_id,
                 "parenttype": "Order",
@@ -72,9 +75,12 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
                 "quantity": item["quantity"],
                 "price": item["price"],
                 "seller_name": item["seller_name"]
-            }).insert()
+            })
 
-        new_item.insert()
+        for item in cart_items:
+            new_item = create_sales_order_item(item)
+            new_item.insert()
+
         frappe.db.commit()
 
         return create_response(SUCCESS, {"order_id": order_id})
@@ -86,6 +92,7 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
     except Exception as e:
         frappe.log_error(f"Error creating order for user {user_id}: {str(e)}", "Order Creation Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
 
 
 
