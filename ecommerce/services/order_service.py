@@ -74,7 +74,7 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
                 "seller_name": item["seller_name"]
             }).insert()
 
-        new_item.insert(
+        new_item.insert()
         frappe.db.commit()
 
         return create_response(SUCCESS, {"order_id": order_id})
