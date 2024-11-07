@@ -60,25 +60,23 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
                 "status": status
             })
 
-        # Insert Sales Order
         sales_order = create_sales_order()
         sales_order.insert()
         order_id = sales_order.name
 
-        def create_sales_order_item(item):
-            return frappe.get_doc({
+        for item in cart_items:
+            frappe.log_error(f"Processing cart item: {item}", "Order Creation Debug")
+
+            new_item = frappe.get_doc({
                 "doctype": "Sales Order Item",
                 "parent": order_id,
                 "parenttype": "Order",
                 "parentfield": "items",
-                "item_code": item["item_code"],
-                "quantity": item["quantity"],
-                "price": item["price"],
-                "seller_name": item["seller_name"]
+                "item_code": item.get("item_code"),
+                "quantity": item.get("quantity"),
+                "price": item.get("price"),
+                "seller_name": item.get("seller_name")
             })
-
-        for item in cart_items:
-            new_item = create_sales_order_item(item)
             new_item.insert()
 
         frappe.db.commit()
@@ -92,7 +90,6 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
     except Exception as e:
         frappe.log_error(f"Error creating order for user {user_id}: {str(e)}", "Order Creation Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
 
 
 
