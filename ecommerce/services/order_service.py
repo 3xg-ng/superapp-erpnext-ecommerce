@@ -41,46 +41,40 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
             FROM `tabCart`
             WHERE user_id = %s
         """, (user_id,), as_dict=True)
-        
-        print(cart_items)
 
         if not cart_items:
             return create_response(NOT_FOUND, "Cart is empty")
 
-        def create_sales_order():
-            return frappe.get_doc({
-                "doctype": "Order",
-                "shipping_address": shipping_address,
-                "lga": lga,
-                "post_code": post_code,
-                "net_total": subtotal,
-                "shipping_fee": shipping_fee,
-                "discount": discount,
-                "grand_total": total,
-                "payment_method": payment_method,
-                "user_id": user_id,
-                "status": status
-            })
-
-        sales_order = create_sales_order()
+        sales_order = frappe.get_doc({
+            "doctype": "Order",
+            "shipping_address": shipping_address,
+            "lga": lga,
+            "post_code": post_code,
+            "net_total": subtotal,
+            "shipping_fee": shipping_fee,
+            "discount": discount,
+            "grand_total": total,
+            "payment_method": payment_method,
+            "user_id": user_id,
+            "status": status
+        })
         sales_order.insert()
+        frappe.db.commit()
         order_id = sales_order.name
 
-        for items in cart_items:
-            frappe.log_error(f"Processing cart item: {items}", "Order Creation Debug")
-
+        for item in cart_items:
             new_item = frappe.get_doc({
                 "doctype": "Sales Order Item",
                 "parent": order_id,
                 "parenttype": "Order",
                 "parentfield": "items",
-                "item_code": items.get("item_code"),
-                "quantity": items.get("quantity"),
-                "price": items.get("price"),
-                "seller_name": items.get("seller_name")
-            })
-            new_item.insert()
+                "item_code": item["item_code"],
+                "quantity": item["quantity"],
+                "price": item["price"],
+                "seller_name": item["seller_name"]
+            }).insert()
 
+        new_item.insert()
         frappe.db.commit()
 
         return create_response(SUCCESS, {"order_id": order_id})
