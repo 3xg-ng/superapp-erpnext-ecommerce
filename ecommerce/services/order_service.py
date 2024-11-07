@@ -46,7 +46,7 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
             return create_response(NOT_FOUND, "Cart is empty")
 
         sales_order = frappe.get_doc({
-            "doctype": "Sales Order",
+            "doctype": "Order",
             "shipping_address": shipping_address,
             "lga": lga,
             "shipping_address_postal_code": post_code,
