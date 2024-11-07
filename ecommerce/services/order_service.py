@@ -64,7 +64,7 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
 
         for item in cart_items:
             new_item = frappe.get_doc({
-                "doctype": "Sales Order Item",
+                "doctype": "Order Item",
                 "parent": order_id,
                 "parenttype": "Order",
                 "parentfield": "item",
