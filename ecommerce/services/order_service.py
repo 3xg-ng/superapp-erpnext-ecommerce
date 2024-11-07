@@ -58,8 +58,6 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
             "user_id": user_id,
             "status": status
         })
-        sales_order.insert()
-        frappe.db.commit()
         order_id = sales_order.name
 
         for item in cart_items:
@@ -74,6 +72,7 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
                 "seller_name": item["seller_name"]
             }).insert()
 
+        sales_order.insert()
         new_item.insert()
         frappe.db.commit()
 
