@@ -6,24 +6,34 @@ from datetime import datetime
 ### Function to List All Orders for a User
 def list_orders(user_id):
     try:
-        query = """
+        orders_query = """
             SELECT *
             FROM `tabOrder`
             WHERE user_id = %s
         """
-        
-        items = frappe.db.sql(query, user_id, as_dict=True)
+        orders = frappe.db.sql(orders_query, user_id, as_dict=True)
 
-        if not items:
-            raise frappe.DoesNotExistError("No items found for this user!")
+        if not orders:
+            raise frappe.DoesNotExistError("No orders found for this user!")
 
-        return create_response(SUCCESS, items)
+        cart_query = """
+            SELECT item_code, quantity, price, seller_name
+            FROM `tabCart`
+            WHERE user_id = %s
+        """
+        cart_items = frappe.db.sql(cart_query, user_id, as_dict=True)
+
+        for order in orders:
+            order["item"] = cart_items
+
+        return create_response(SUCCESS, orders)
 
     except frappe.DoesNotExistError as e:
         return create_response(NOT_FOUND, str(e))
     except Exception as e:
-        frappe.log_error(message=str(e), title="Error fetching items")
+        frappe.log_error(message=str(e), title="Error fetching orders and cart items")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
     
 
 def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, discount, total, payment_method, user_id, status):
