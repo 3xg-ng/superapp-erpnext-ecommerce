@@ -6,14 +6,19 @@ from ecommerce.utils.response_helper import create_response
 def list_cart_items(user_id):
     try:
         query = """
-            SELECT cart.product_id, cart.quantity, cart.price, 
-                   product.name AS product_name, product.description, product.image_url
+            SELECT 
+                cart.product_id,
+                cart.quantity,
+                product.product_name,
+                product.price,
+                product.image,
+                product.seller_name
             FROM `tabCart` AS cart
             JOIN `tabProduct` AS product ON cart.product_id = product.id
             WHERE cart.user_id = %s
         """
         
-        items = frappe.db.sql(query, (user_id,), as_dict=True)
+        items = frappe.db.sql(query, user_id, as_dict=True)
 
         if not items:
             raise frappe.DoesNotExistError("No items found for this user!")
