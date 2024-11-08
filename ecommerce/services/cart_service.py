@@ -31,7 +31,7 @@ def add_to_cart(user_id, item_code):
         product_details = frappe.db.get_value(
             "Products", 
             {"item_code": item_code}, 
-            ["product_name", "price", "image", "seller_name"], 
+            ["product_name", "new_price", "image", "seller_name"], 
             as_dict=True
         )
 
@@ -52,7 +52,7 @@ def add_to_cart(user_id, item_code):
                 "item_code": item_code,
                 "quantity": 1,
                 "product_name": product_details["product_name"],
-                "price": product_details["price"],
+                "price": product_details["new_price"],
                 "image": product_details["image"],
                 "seller_name": product_details["seller_name"]
             })
