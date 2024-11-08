@@ -6,16 +6,9 @@ from ecommerce.utils.response_helper import create_response
 def list_cart_items(user_id):
     try:
         query = """
-            SELECT 
-                cart.product_id,
-                cart.quantity,
-                product.product_name,
-                product.price,
-                product.image,
-                product.seller_name
-            FROM `tabCart` AS cart
-            JOIN `tabProduct` AS product ON cart.product_id = product.id
-            WHERE cart.user_id = %s
+            SELECT *
+            FROM `tabCart`
+            WHERE user_id = %s
         """
         
         items = frappe.db.sql(query, user_id, as_dict=True)
@@ -30,7 +23,6 @@ def list_cart_items(user_id):
     except Exception as e:
         frappe.log_error(message=str(e), title="Error fetching items")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
 
 
 
