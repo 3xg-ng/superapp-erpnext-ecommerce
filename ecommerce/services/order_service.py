@@ -35,11 +35,12 @@ def list_orders(user_id):
 
 def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, discount, total, payment_method, user_id, status):
     try:
-        cart_items = frappe.db.sql("""
-            SELECT item_code, quantity, price, seller_name
-            FROM `tabCart`
-            WHERE user_id = %s
-        """, (user_id,), as_dict=True)
+        cart_items = frappe.db.get_value(
+            "Cart", 
+            {"user_id": user_id}, 
+            ["quantity", "price", "seller_name"], 
+            as_dict=True
+        )
 
         if not cart_items:
             return create_response(NOT_FOUND, "Cart is empty")
@@ -60,19 +61,13 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
 
         order_id = sales_order.name
 
-        for item in cart_items:
-            frappe.log_error(f"Processing cart item: {item}", "Order Creation Debug")
-
-            new_item = frappe.get_doc({
-                "doctype": "Order Item",
-                "parent": order_id,        
-                "parenttype": "Order",
-                "parentfield": "item",
-                "item_code": item.get("item_code"),
-                "quantity": item.get("quantity"),
-                "price": item.get("price"),
-                "seller_name": item.get("seller_name")
-            })
+        new_item = frappe.get_doc({
+            "doctype": "Order Item",
+            "item_code": order_id,
+            "quantity": cart_items["quantity"],
+            "price": cart_items("price"),
+            "seller_name": cart_items("seller_name")
+        })
             
         
         sales_order.insert()
