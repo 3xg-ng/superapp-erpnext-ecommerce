@@ -18,11 +18,11 @@ def list_orders(user_id):
 
         for order in orders:
             order_items = frappe.db.sql("""
-                SELECT item_code, item_name, qty, rate, amount
-                FROM `tabSales Order Item`
+                SELECT *
+                FROM `tabOrder Item`
                 WHERE parent = %s
             """, (order["order_id"],), as_dict=True)
-            order["items"] = order_items
+            order["item"] = order_items
 
         return create_response(SUCCESS, orders)
 
