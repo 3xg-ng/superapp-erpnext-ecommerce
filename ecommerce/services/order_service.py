@@ -7,8 +7,8 @@ from datetime import datetime
 def list_orders(user_id):
     try:
         orders = frappe.db.sql("""
-            SELECT name AS order_id, total_price, status
-            FROM `tabSales Order`
+            SELECT *
+            FROM `tabOrder`
             WHERE user_id = %s
             ORDER BY creation DESC;
         """, (user_id,), as_dict=True)
@@ -33,7 +33,6 @@ def list_orders(user_id):
         frappe.log_error(f"Error fetching orders for user {user_id}: {str(e)}", "Order Listing Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
-### Function to Create a New Order
 def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, discount, total, payment_method, user_id, status):
     try:
         cart_items = frappe.db.sql("""
@@ -92,20 +91,16 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
 
 
 
-### Function to Update an Existing Order
 def update_order(order_id, status=None, items=None):
     
     try:
-        # Fetch the existing order
         order = frappe.get_doc("Sales Order", order_id)
 
-        # Update status if provided
         if status:
             order.status = status
 
-        # Update items if provided
         if items:
-            order.items = []  # Clear existing items
+            order.items = [] 
             for item in items:
                 order.append("items", {
                     "item_code": item["item_code"],
@@ -128,7 +123,6 @@ def update_order(order_id, status=None, items=None):
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 
-### Function to Delete an Order
 def delete_order(order_id):
     """
     Delete an existing order by its ID.
@@ -137,7 +131,6 @@ def delete_order(order_id):
     :return: JSON response indicating success or error.
     """
     try:
-        # Fetch and delete the order
         order = frappe.get_doc("Sales Order", order_id)
         order.delete()
         frappe.db.commit()
