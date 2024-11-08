@@ -6,32 +6,25 @@ from datetime import datetime
 ### Function to List All Orders for a User
 def list_orders(user_id):
     try:
-        orders = frappe.db.sql("""
+        query = """
             SELECT *
             FROM `tabOrder`
             WHERE user_id = %s
-            ORDER BY creation DESC;
-        """, (user_id,), as_dict=True)
+        """
+        
+        items = frappe.db.sql(query, user_id, as_dict=True)
 
-        if not orders:
-            raise frappe.DoesNotExistError("No orders found for this user!")
+        if not items:
+            raise frappe.DoesNotExistError("No items found for this user!")
 
-        for order in orders:
-            order_items = frappe.db.sql("""
-                SELECT *
-                FROM `tabOrder Item`
-                WHERE parent = %s
-            """, (order["order_id"],), as_dict=True)
-            order["item"] = order_items
-
-        return create_response(SUCCESS, orders)
+        return create_response(SUCCESS, items)
 
     except frappe.DoesNotExistError as e:
         return create_response(NOT_FOUND, str(e))
-
     except Exception as e:
-        frappe.log_error(f"Error fetching orders for user {user_id}: {str(e)}", "Order Listing Error")
+        frappe.log_error(message=str(e), title="Error fetching items")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+    
 
 def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, discount, total, payment_method, user_id, status):
     try:
@@ -64,6 +57,9 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
 
         new_item = frappe.get_doc({
             "doctype": "Order Item",
+            "parent": order_id,
+            "parenttype": "Order",
+            "parentfield": "item",
             "item_code": order_id,
             "quantity": cart_items["quantity"],
             "price": cart_items["price"],
