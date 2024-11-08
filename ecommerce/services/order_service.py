@@ -42,7 +42,7 @@ def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, disco
             "Cart", 
             {"user_id": user_id}, 
             ["quantity", "price", "seller_name"], 
-            as_dict=True
+            # as_dict=True
         )
 
         if not cart_items:
