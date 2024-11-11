@@ -24,10 +24,6 @@ def get_all_items_by_category_limit():
 
 
 @frappe.whitelist(allow_guest=True)
-def get_all_items_by_category():
-    return list_items_by_category()
-
-@frappe.whitelist(allow_guest=True)
 def get_single_item(item_code):
     return get_item_by_code(item_code)
 

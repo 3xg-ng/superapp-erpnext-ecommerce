@@ -142,65 +142,6 @@ def list_items_category(limit=8, offset=0, search=None, letter=None, category=No
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 
-@frappe.whitelist(allow_guest=True)
-def list_items_by_category(limit=50, offset=0, search=None, category=None, collection=None, min_price=None, max_price=None):
-    """
-    Fetch items with filters for categories such as 'Smartphones', 'Accessories', 
-    'Laptops', etc., and collections like 'New Arrival', 'Official Store', 'Best Seller', etc.
-    """
-    try:
-        query = """
-            SELECT *
-            FROM `tabProducts`
-            WHERE 1=1
-        """
-        
-        filters = []
-        
-        # Filter by category (e.g., Smartphones, Accessories)
-        if category:
-            query += " AND category = %s"
-            filters.append(category)
-
-        # Filter by collection (e.g., New Arrival, Official Store, Best Seller)
-        if collection:
-            query += " AND collection = %s"
-            filters.append(collection)
-        
-        # Search by product name or description
-        if search:
-            query += " AND (product_name LIKE %s OR description LIKE %s)"
-            filters.extend([f"%{search}%", f"%{search}%"])
-        
-        # Filter by minimum price
-        if min_price is not None:
-            query += " AND new_price >= %s"
-            filters.append(min_price)
-        
-        # Filter by maximum price
-        if max_price is not None:
-            query += " AND new_price <= %s"
-            filters.append(max_price)
-        
-        # Apply pagination
-        query += " LIMIT %s OFFSET %s"
-        filters.extend([limit, offset])
-        
-        # Execute the query with the filters
-        items = frappe.db.sql(query, filters, as_dict=True)
-
-        if not items:
-            raise frappe.DoesNotExistError("No items found!")
-
-        return create_response(SUCCESS, items)
-
-    except frappe.DoesNotExistError as e:
-        return create_response(NOT_FOUND, str(e))
-    except Exception as e:
-        frappe.log_error(message=str(e), title="Error fetching items")
-        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
-
 
 ### Get single item by code
 def get_item_by_code(item_code):
