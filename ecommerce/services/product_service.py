@@ -142,361 +142,51 @@ def list_items_category(limit=8, offset=0, search=None, letter=None, category=No
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 
-
-### Get items by Smartphone category
-def list_items_smartphone(limit=50, offset=0, search=None, category=None, min_price=None, max_price=None):
-   
+@frappe.whitelist(allow_guest=True)
+def list_items_by_category(limit=50, offset=0, search=None, category=None, collection=None, min_price=None, max_price=None):
+    """
+    Fetch items with filters for categories such as 'Smartphones', 'Accessories', 
+    'Laptops', etc., and collections like 'New Arrival', 'Official Store', 'Best Seller', etc.
+    """
     try:
         query = """
             SELECT *
             FROM `tabProducts`
-            WHERE category="Smartphones"
+            WHERE 1=1
         """
         
         filters = []
         
-        if search:
-            query += " AND (product_name LIKE %s OR description LIKE %s)"
-            filters.extend([f"%{search}%", f"%{search}%"])
-
+        # Filter by category (e.g., Smartphones, Accessories)
         if category:
             query += " AND category = %s"
             filters.append(category)
 
-        if min_price is not None:
-            query += " AND new_price >= %s"
-            filters.append(min_price)
-        
-        if max_price is not None:
-            query += " AND new_price <= %s"
-            filters.append(max_price)
-
-        query += " LIMIT %s OFFSET %s"
-        filters.extend([limit, offset])
-        
-        items = frappe.db.sql(query, filters, as_dict=True)
-
-        if not items:
-            raise frappe.DoesNotExistError("No items found!")
-
-        return create_response(SUCCESS, items)
-
-    except frappe.DoesNotExistError as e:
-        return create_response(NOT_FOUND, str(e))
-    except Exception as e:
-        frappe.log_error(message=str(e), title="Error fetching items")
-        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
-    
-
-### Get items by Accessories category
-def list_items_accessories(limit=50, offset=0, search=None, category=None, min_price=None, max_price=None):
-   
-    try:
-        query = """
-            SELECT *
-            FROM `tabProducts`
-            WHERE category="Accessories"
-        """
-        
-        filters = []
-        
-        if search:
-            query += " AND (product_name LIKE %s OR description LIKE %s)"
-            filters.extend([f"%{search}%", f"%{search}%"])
-
-        if category:
-            query += " AND category = %s"
-            filters.append(category)
-
-        if min_price is not None:
-            query += " AND new_price >= %s"
-            filters.append(min_price)
-        
-        if max_price is not None:
-            query += " AND new_price <= %s"
-            filters.append(max_price)
-
-        query += " LIMIT %s OFFSET %s"
-        filters.extend([limit, offset])
-        
-        items = frappe.db.sql(query, filters, as_dict=True)
-
-        if not items:
-            raise frappe.DoesNotExistError("No items found!")
-
-        return create_response(SUCCESS, items)
-
-    except frappe.DoesNotExistError as e:
-        return create_response(NOT_FOUND, str(e))
-    except Exception as e:
-        frappe.log_error(message=str(e), title="Error fetching items")
-        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
-
-
-### Get items by Laptops category
-def list_items_laptops(limit=50, offset=0, search=None, category=None, min_price=None, max_price=None):
-   
-    try:
-        query = """
-            SELECT *
-            FROM `tabProducts`
-            WHERE category="Laptops"
-        """
-        
-        filters = []
-        
-        if search:
-            query += " AND (product_name LIKE %s OR description LIKE %s)"
-            filters.extend([f"%{search}%", f"%{search}%"])
-
-        if category:
-            query += " AND category = %s"
-            filters.append(category)
-
-        if min_price is not None:
-            query += " AND new_price >= %s"
-            filters.append(min_price)
-        
-        if max_price is not None:
-            query += " AND new_price <= %s"
-            filters.append(max_price)
-
-        query += " LIMIT %s OFFSET %s"
-        filters.extend([limit, offset])
-        
-        items = frappe.db.sql(query, filters, as_dict=True)
-
-        if not items:
-            raise frappe.DoesNotExistError("No items found!")
-
-        return create_response(SUCCESS, items)
-
-    except frappe.DoesNotExistError as e:
-        return create_response(NOT_FOUND, str(e))
-    except Exception as e:
-        frappe.log_error(message=str(e), title="Error fetching items")
-        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
-
-
-
-### Get items by Home Appliance category
-def list_items_home_appliance(limit=50, offset=0, search=None, category=None, min_price=None, max_price=None):
-   
-    try:
-        query = """
-            SELECT *
-            FROM `tabProducts`
-            WHERE category="Home Appliance"
-        """
-        
-        filters = []
-        
-        if search:
-            query += " AND (product_name LIKE %s OR description LIKE %s)"
-            filters.extend([f"%{search}%", f"%{search}%"])
-
-        if category:
-            query += " AND category = %s"
-            filters.append(category)
-
-        if min_price is not None:
-            query += " AND new_price >= %s"
-            filters.append(min_price)
-        
-        if max_price is not None:
-            query += " AND new_price <= %s"
-            filters.append(max_price)
-
-        query += " LIMIT %s OFFSET %s"
-        filters.extend([limit, offset])
-        
-        items = frappe.db.sql(query, filters, as_dict=True)
-
-        if not items:
-            raise frappe.DoesNotExistError("No items found!")
-
-        return create_response(SUCCESS, items)
-
-    except frappe.DoesNotExistError as e:
-        return create_response(NOT_FOUND, str(e))
-    except Exception as e:
-        frappe.log_error(message=str(e), title="Error fetching items")
-        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
-    
-
-### Get items by Kiddies category
-def list_items_kiddies(limit=50, offset=0, search=None, category=None, min_price=None, max_price=None):
-   
-    try:
-        query = """
-            SELECT *
-            FROM `tabProducts`
-            WHERE category="Kiddies"
-        """
-        
-        filters = []
-        
-        if search:
-            query += " AND (product_name LIKE %s OR description LIKE %s)"
-            filters.extend([f"%{search}%", f"%{search}%"])
-
-        if category:
-            query += " AND category = %s"
-            filters.append(category)
-
-        if min_price is not None:
-            query += " AND new_price >= %s"
-            filters.append(min_price)
-        
-        if max_price is not None:
-            query += " AND new_price <= %s"
-            filters.append(max_price)
-
-        query += " LIMIT %s OFFSET %s"
-        filters.extend([limit, offset])
-        
-        items = frappe.db.sql(query, filters, as_dict=True)
-
-        if not items:
-            raise frappe.DoesNotExistError("No items found!")
-
-        return create_response(SUCCESS, items)
-
-    except frappe.DoesNotExistError as e:
-        return create_response(NOT_FOUND, str(e))
-    except Exception as e:
-        frappe.log_error(message=str(e), title="Error fetching items")
-        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
-    
-
-### Get items by New Arrival category
-def list_items_new_arrival(limit=50, offset=0, search=None, category=None, min_price=None, max_price=None):
-   
-    try:
-        query = """
-            SELECT *
-            FROM `tabProducts`
-            WHERE collection="New Arrival"
-        """
-        
-        filters = []
-        
-        if search:
-            query += " AND (product_name LIKE %s OR description LIKE %s)"
-            filters.extend([f"%{search}%", f"%{search}%"])
-
-        if category:
+        # Filter by collection (e.g., New Arrival, Official Store, Best Seller)
+        if collection:
             query += " AND collection = %s"
-            filters.append(category)
-
-        if min_price is not None:
-            query += " AND new_price >= %s"
-            filters.append(min_price)
+            filters.append(collection)
         
-        if max_price is not None:
-            query += " AND new_price <= %s"
-            filters.append(max_price)
-
-        query += " LIMIT %s OFFSET %s"
-        filters.extend([limit, offset])
-        
-        items = frappe.db.sql(query, filters, as_dict=True)
-
-        if not items:
-            raise frappe.DoesNotExistError("No items found!")
-
-        return create_response(SUCCESS, items)
-
-    except frappe.DoesNotExistError as e:
-        return create_response(NOT_FOUND, str(e))
-    except Exception as e:
-        frappe.log_error(message=str(e), title="Error fetching items")
-        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
-
-
-### Get items by New Arrival category
-def list_items_official_store(limit=50, offset=0, search=None, category=None, min_price=None, max_price=None):
-   
-    try:
-        query = """
-            SELECT *
-            FROM `tabProducts`
-            WHERE collection="Official Store"
-        """
-        
-        filters = []
-        
+        # Search by product name or description
         if search:
             query += " AND (product_name LIKE %s OR description LIKE %s)"
             filters.extend([f"%{search}%", f"%{search}%"])
-
-        if category:
-            query += " AND collection = %s"
-            filters.append(category)
-
+        
+        # Filter by minimum price
         if min_price is not None:
             query += " AND new_price >= %s"
             filters.append(min_price)
         
+        # Filter by maximum price
         if max_price is not None:
             query += " AND new_price <= %s"
             filters.append(max_price)
-
+        
+        # Apply pagination
         query += " LIMIT %s OFFSET %s"
         filters.extend([limit, offset])
         
-        items = frappe.db.sql(query, filters, as_dict=True)
-
-        if not items:
-            raise frappe.DoesNotExistError("No items found!")
-
-        return create_response(SUCCESS, items)
-
-    except frappe.DoesNotExistError as e:
-        return create_response(NOT_FOUND, str(e))
-    except Exception as e:
-        frappe.log_error(message=str(e), title="Error fetching items")
-        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
-
-
-### Get items by New Arrival category
-def list_items_best_seller(limit=50, offset=0, search=None, category=None, min_price=None, max_price=None):
-   
-    try:
-        query = """
-            SELECT *
-            FROM `tabProducts`
-            WHERE collection="Best Seller"
-        """
-        
-        filters = []
-        
-        if search:
-            query += " AND (product_name LIKE %s OR description LIKE %s)"
-            filters.extend([f"%{search}%", f"%{search}%"])
-
-        if category:
-            query += " AND collection = %s"
-            filters.append(category)
-
-        if min_price is not None:
-            query += " AND new_price >= %s"
-            filters.append(min_price)
-        
-        if max_price is not None:
-            query += " AND new_price <= %s"
-            filters.append(max_price)
-
-        query += " LIMIT %s OFFSET %s"
-        filters.extend([limit, offset])
-        
+        # Execute the query with the filters
         items = frappe.db.sql(query, filters, as_dict=True)
 
         if not items:
