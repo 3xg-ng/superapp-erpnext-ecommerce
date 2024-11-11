@@ -3,8 +3,19 @@ import frappe
 from ecommerce.services.product_service import list_items, list_items_category, list_items_smartphone, list_items_accessories, list_items_laptops, list_items_home_appliance, list_items_kiddies, list_items_new_arrival, list_items_best_seller, list_items_official_store, get_item_by_code, add_new_item, update_item_by_code, delete_item_by_code
     
 @frappe.whitelist(allow_guest=True)
-def get_all_items():
-    return list_items()
+def get_all_items(product_name=None, min_price=None, max_price=None, color=None, category=None, brand=None, rating=None, discount=None):
+    filters = {
+        "product_name": product_name,
+        "min_price": min_price,
+        "max_price": max_price,
+        "color": color,
+        "category": category,
+        "brand": brand,
+        "rating": rating,
+        "discount": discount
+    }
+    return list_items(filters)
+
 
 
 @frappe.whitelist(allow_guest=True)
