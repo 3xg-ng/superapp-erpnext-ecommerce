@@ -36,31 +36,21 @@ def list_orders(user_id):
 
     
 
-def create_order(shipping_address, lga, post_code, subtotal, shipping_fee, discount, total, payment_method, user_id, status):
+def create_order(shipping_address, lga, post_code, subtotal, item, discount, total, payment_method, user_id, status):
     try:
-        cart_items = frappe.db.get_value(
-            "Cart", 
-            {"user_id": user_id}, 
-            ["quantity", "price", "seller_name"], 
-            # as_dict=True
-        )
-
-        if not cart_items:
-            return create_response(NOT_FOUND, "Cart is empty")
-
+        
         sales_order = frappe.get_doc({
             "doctype": "Order",
             "shipping_address": shipping_address,
             "lga": lga,
             "post_code": post_code,
             "net_total": subtotal,
-            "shipping_fee": shipping_fee,
             "discount": discount,
             "grand_total": total,
             "payment_method": payment_method,
             "user_id": user_id,
             "status": status,
-            "item": cart_items,
+            "item": item,
         })
         sales_order.insert()
         frappe.db.commit()
