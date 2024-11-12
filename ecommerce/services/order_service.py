@@ -36,9 +36,9 @@ def list_orders(user_id):
 
     
 
-def create_order(shipping_address, lga, post_code, subtotal, item, discount, total, payment_method, user_id, status):
+def create_order(shipping_address, lga, post_code, subtotal, items, discount, grand_total, payment_method, user_id, status="Pending"):
     try:
-        
+        # Create the main Order document
         sales_order = frappe.get_doc({
             "doctype": "Order",
             "shipping_address": shipping_address,
@@ -46,17 +46,25 @@ def create_order(shipping_address, lga, post_code, subtotal, item, discount, tot
             "post_code": post_code,
             "net_total": subtotal,
             "discount": discount,
-            "grand_total": total,
+            "grand_total": grand_total,
             "payment_method": payment_method,
             "user_id": user_id,
             "status": status,
-            "item": item,
+            "items": [
+                {
+                    "doctype": "Order Item",
+                    "item_code": item["item_code"],
+                    "product_name": item["product_name"],
+                    "quantity": item["quantity"],
+                    "seller_name": item["seller_name"]
+                } for item in items
+            ]
         })
+        
         sales_order.insert()
         frappe.db.commit()
 
         order_id = sales_order.name
-
 
         return create_response(SUCCESS, {"order_id": order_id})
 
@@ -67,6 +75,7 @@ def create_order(shipping_address, lga, post_code, subtotal, item, discount, tot
     except Exception as e:
         frappe.log_error(f"Error creating order for user {user_id}: {str(e)}", "Order Creation Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
 
 
 
