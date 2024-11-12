@@ -58,8 +58,9 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, sh
                     "product_name": item["product_name"],
                     "quantity": item["quantity"],
                     "seller_name": item["seller_name"]
-                } for item in items
+                } for item in items if isinstance(item, dict)
             ]
+
         })
         
         sales_order.insert()
