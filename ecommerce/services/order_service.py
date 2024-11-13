@@ -73,7 +73,7 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, sh
             "payment_method": payment_method,
             "user_id": user_id,
             "status": status,
-            "item": validated_items 
+            "items": validated_items 
         })
         
         sales_order.insert()
