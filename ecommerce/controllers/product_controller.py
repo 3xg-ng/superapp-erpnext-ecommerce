@@ -1,6 +1,6 @@
 import frappe
 
-from ecommerce.services.product_service import list_items, list_items_category, get_item_by_code, add_new_item, update_item_by_code, delete_item_by_code
+from ecommerce.services.product_service import list_items, list_items_category, get_item_by_code, add_new_item, update_item_by_code, delete_item_by_code, fetch_similar_items
     
 @frappe.whitelist(allow_guest=True)
 def get_all_items(product_name=None, min_price=None, max_price=None, color=None, category=None, brand=None, rating=None, discount=None):
@@ -16,6 +16,10 @@ def get_all_items(product_name=None, min_price=None, max_price=None, color=None,
     }
     return list_items(filters)
 
+
+@frappe.whitelist(allow_guest=True)
+def get_product_details(item_code):
+    return fetch_similar_items(item_code)
 
 @frappe.whitelist(allow_guest=True)
 def get_all_items_by_category_limit():

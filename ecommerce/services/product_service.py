@@ -3,30 +3,21 @@ from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR
 from ecommerce.utils.response_helper import create_response
 
 ### Get all items
-def list_items(item_code, filters=None):
+def list_items(filters=None):
     try:
-        query = """
-            SELECT category, brand, new_price
-            FROM `tabProducts`
-            WHERE item_code = %s
-        """
-        current_item = frappe.db.sql(query, (item_code,), as_dict=True)
-
-        if not current_item:
-            raise frappe.DoesNotExistError("The specified item does not exist!")
-
-        category = current_item[0]["category"]
-        brand = current_item[0]["brand"]
-        base_price = current_item[0]["new_price"]
-
         query = """
             SELECT item_code, product_name, old_price, new_price, image, rating, color, category, brand, discount
             FROM `tabProducts`
-            WHERE category = %s AND brand = %s AND item_code != %s
+            WHERE 1=1
         """
-        params = [category, brand, item_code]
+
+        params = []
 
         if filters:
+            if filters.get("product_name"):
+                query += " AND product_name LIKE %s"
+                params.append(f"%{filters['product_name']}%")
+
             if filters.get("min_price") is not None:
                 query += " AND new_price >= %s"
                 params.append(filters["min_price"])
@@ -39,6 +30,14 @@ def list_items(item_code, filters=None):
                 query += " AND color = %s"
                 params.append(filters["color"])
 
+            if filters.get("category"):
+                query += " AND category = %s"
+                params.append(filters["category"])
+
+            if filters.get("brand"):
+                query += " AND brand = %s"
+                params.append(filters["brand"])
+
             if filters.get("rating"):
                 query += " AND rating >= %s"
                 params.append(filters["rating"])
@@ -46,6 +45,49 @@ def list_items(item_code, filters=None):
             if filters.get("discount"):
                 query += " AND discount >= %s"
                 params.append(filters["discount"])
+
+        # Execute the query with parameters
+        items = frappe.db.sql(query, params, as_dict=True)
+
+        if not items:
+            raise frappe.DoesNotExistError("No items found with the specified filters!")
+
+        return create_response(SUCCESS, items)
+
+    except frappe.DoesNotExistError as e:
+        return create_response(NOT_FOUND, str(e))
+    except Exception as e:
+        frappe.log_error(message=str(e), title="Error fetching items")
+        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
+
+
+def fetch_similar_items(item_code):
+    try:
+        # Fetch the details of the current product
+        query = """
+            SELECT category, brand, new_price
+            FROM `tabProducts`
+            WHERE item_code = %s
+        """
+        current_item = frappe.db.sql(query, (item_code,), as_dict=True)
+
+        if not current_item:
+            raise frappe.DoesNotExistError("The specified item does not exist!")
+
+        # Extract category and brand for similarity
+        category = current_item[0]["category"]
+        brand = current_item[0]["brand"]
+        base_price = current_item[0]["new_price"]
+
+        # Define the query to find similar items
+        query = """
+            SELECT item_code, product_name, old_price, new_price, image, rating, color, category, brand, discount
+            FROM `tabProducts`
+            WHERE category = %s AND brand = %s AND item_code != %s
+        """
+        params = [category, brand, item_code]
+
 
         # Execute the query to fetch similar items
         similar_items = frappe.db.sql(query, params, as_dict=True)
@@ -60,8 +102,6 @@ def list_items(item_code, filters=None):
     except Exception as e:
         frappe.log_error(message=str(e), title="Error fetching similar items")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
-
 
 
 def list_items_category(limit=8, offset=0, search=None, letter=None, category=None, min_price=None, max_price=None):
