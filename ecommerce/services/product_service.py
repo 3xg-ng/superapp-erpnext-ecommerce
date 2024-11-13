@@ -279,7 +279,7 @@ def add_to_wishlist(user_id, item_code):
     try:
         # Check if item is already in the wishlist
         existing_entry = frappe.db.sql("""
-            SELECT name FROM `tabWishlist`
+            SELECT name FROM `tabProductWishlist`
             WHERE user_id = %s AND item_code = %s
         """, (user_id, item_code), as_dict=True)
 
@@ -308,7 +308,7 @@ def remove_from_wishlist(user_id, item_code):
     try:
         # Check if the item exists in the wishlist
         existing_entry = frappe.db.sql("""
-            SELECT name FROM `tabWishlist`
+            SELECT name FROM `tabProductWishlist`
             WHERE user_id = %s AND item_code = %s
         """, (user_id, item_code), as_dict=True)
 
@@ -317,7 +317,7 @@ def remove_from_wishlist(user_id, item_code):
 
         # Delete the wishlist item
         frappe.db.sql("""
-            DELETE FROM `tabWishlist`
+            DELETE FROM `tabProductWishlist`
             WHERE user_id = %s AND item_code = %s
         """, (user_id, item_code))
         
@@ -334,7 +334,7 @@ def get_wishlist(user_id):
     try:
         wishlist_items = frappe.db.sql("""
             SELECT w.name, w.item_code, p.product_name, p.new_price, p.image
-            FROM `tabWishlist` w
+            FROM `tabProductWishlist` w
             LEFT JOIN `tabProducts` p ON w.item_code = p.item_code
             WHERE w.user_id = %s
         """, (user_id,), as_dict=True)
