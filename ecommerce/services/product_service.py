@@ -328,3 +328,22 @@ def remove_from_wishlist(user_id, item_code):
     except Exception as e:
         frappe.log_error(message=str(e), title="Error removing from wishlist")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
+
+def get_wishlist(user_id):
+    try:
+        wishlist_items = frappe.db.sql("""
+            SELECT w.name, w.item_code, p.product_name, p.new_price, p.image
+            FROM `tabWishlist` w
+            LEFT JOIN `tabProducts` p ON w.item_code = p.item_code
+            WHERE w.user_id = %s
+        """, (user_id,), as_dict=True)
+
+        if not wishlist_items:
+            return create_response(NOT_FOUND, "No items found in wishlist.")
+
+        return create_response(SUCCESS, wishlist_items)
+
+    except Exception as e:
+        frappe.log_error(message=str(e), title="Error fetching wishlist")
+        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
