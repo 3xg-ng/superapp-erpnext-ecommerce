@@ -38,15 +38,17 @@ def list_orders(user_id):
 
 def create_order(shipping_address, lga, post_code, subtotal, items, discount, shipping_fee, grand_total, payment_method, user_id, status="Drafted"):
     try:
+        # Validate items format
         if not isinstance(items, list) or not all(isinstance(item, dict) for item in items):
-            raise ValueError("Items must be a list of dictionaries.")
+            raise ValueError("Items must be a list of dictionaries with item_code, price, quantity, and seller_name.")
 
         validated_items = []
         for item in items:
-            required_keys = ["item_code", "price", "quantity", "seller_name"]
-            if not all(key in item and item[key] is not None for key in required_keys):
+            # Ensure each item has the required fields
+            required_fields = ["item_code", "price", "quantity", "seller_name"]
+            if not all(field in item for field in required_fields):
                 raise ValueError("Each item must include item_code, price, quantity, and seller_name.")
-
+            
             validated_items.append({
                 "doctype": "Order Item",
                 "item_code": item["item_code"],
@@ -55,6 +57,7 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, sh
                 "seller_name": item["seller_name"]
             })
 
+        # Create the main Order document
         sales_order = frappe.get_doc({
             "doctype": "Order",
             "shipping_address": shipping_address,
@@ -67,7 +70,7 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, sh
             "payment_method": payment_method,
             "user_id": user_id,
             "status": status,
-            "items": validated_items
+            "items": validated_items  # Pass validated items list
         })
         
         sales_order.insert()
@@ -87,6 +90,8 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, sh
     except Exception as e:
         frappe.log_error(f"Error creating order for user {user_id}: {str(e)}", "Order Creation Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
+
 
 
 
