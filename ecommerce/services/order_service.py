@@ -38,8 +38,8 @@ def list_orders(user_id):
 
 def create_order(shipping_address, lga, post_code, subtotal, items, discount, shipping_fee, grand_total, payment_method, user_id, status="Drafted"):
     try:
-        # if not isinstance(items, list) or not all(isinstance(item, dict) for item in items):
-        #     raise ValueError("Items must be a list of dictionaries.")
+        if not isinstance(items, list) or not all(isinstance(item, dict) for item in items):
+            raise ValueError("Items must be a list of dictionaries.")
 
         validated_items = []
         for item in items:
