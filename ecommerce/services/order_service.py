@@ -38,17 +38,17 @@ def list_orders(user_id):
 
 def create_order(shipping_address, lga, post_code, subtotal, items, discount, shipping_fee, grand_total, payment_method, user_id, status="Drafted"):
     try:
-        # Validate items format
-        if not isinstance(items, list) or not all(isinstance(item, dict) for item in items):
-            raise ValueError("Items must be a list of dictionaries with item_code, price, quantity, and seller_name.")
+        # Verify `items` is a list of dictionaries
+        if not isinstance(items, list):
+            raise ValueError("Items must be a list.")
+        if not all(isinstance(item, dict) for item in items):
+            raise ValueError("Each item in 'items' must be a dictionary.")
 
+        # Ensure each dictionary in `items` has required keys
         validated_items = []
         for item in items:
-            # Ensure each item has the required fields
-            required_fields = ["item_code", "price", "quantity", "seller_name"]
-            if not all(field in item for field in required_fields):
+            if not all(key in item for key in ["item_code", "price", "quantity", "seller_name"]):
                 raise ValueError("Each item must include item_code, price, quantity, and seller_name.")
-            
             validated_items.append({
                 "doctype": "Order Item",
                 "item_code": item["item_code"],
@@ -56,6 +56,9 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, sh
                 "quantity": item["quantity"],
                 "seller_name": item["seller_name"]
             })
+
+        # Debugging logs
+        frappe.log_error(message=f"Validated items structure: {validated_items}", title="Order Creation Items Validation")
 
         # Create the main Order document
         sales_order = frappe.get_doc({
@@ -70,7 +73,7 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, sh
             "payment_method": payment_method,
             "user_id": user_id,
             "status": status,
-            "items": validated_items  # Pass validated items list
+            "items": validated_items
         })
         
         sales_order.insert()
@@ -90,7 +93,6 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, sh
     except Exception as e:
         frappe.log_error(f"Error creating order for user {user_id}: {str(e)}", "Order Creation Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
 
 
 
