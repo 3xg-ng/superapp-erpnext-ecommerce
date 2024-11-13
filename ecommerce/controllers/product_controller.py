@@ -1,6 +1,6 @@
 import frappe
 
-from ecommerce.services.product_service import list_items, list_items_category, get_item_by_code, add_new_item, update_item_by_code, delete_item_by_code, fetch_similar_items
+from ecommerce.services.product_service import list_items, list_items_category, get_item_by_code, add_new_item, update_item_by_code, delete_item_by_code, fetch_similar_items, add_to_wishlist, remove_from_wishlist
     
 @frappe.whitelist(allow_guest=True)
 def get_all_items(product_name=None, min_price=None, max_price=None, color=None, category=None, brand=None, rating=None, discount=None):
@@ -41,3 +41,12 @@ def update_item_by_code(item_code, product_name, category, old_price, new_price,
 @frappe.whitelist(allow_guest=True)
 def delete_item(item_code):
     return delete_item_by_code(item_code)
+
+
+@frappe.whitelist(allow_guest=True)
+def add_wishlist(user_id, item_code):
+    return add_to_wishlist(user_id, item_code)
+
+@frappe.whitelist(allow_guest=True)
+def remove_wishlist(user_id, item_code):
+    return remove_from_wishlist(user_id, item_code)

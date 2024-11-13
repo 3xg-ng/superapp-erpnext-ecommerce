@@ -62,48 +62,6 @@ def list_items(filters=None):
 
 
 
-def fetch_similar_items(item_code):
-    try:
-        # Fetch the details of the current product
-        query = """
-            SELECT category, brand, new_price
-            FROM `tabProducts`
-            WHERE item_code = %s
-        """
-        current_item = frappe.db.sql(query, (item_code,), as_dict=True)
-
-        if not current_item:
-            raise frappe.DoesNotExistError("The specified item does not exist!")
-
-        # Extract category and brand for similarity
-        category = current_item[0]["category"]
-        brand = current_item[0]["brand"]
-        base_price = current_item[0]["new_price"]
-
-        # Define the query to find similar items
-        query = """
-            SELECT item_code, product_name, old_price, new_price, image, rating, color, category, brand, discount
-            FROM `tabProducts`
-            WHERE category = %s AND brand = %s AND item_code != %s
-        """
-        params = [category, brand, item_code]
-
-
-        # Execute the query to fetch similar items
-        similar_items = frappe.db.sql(query, params, as_dict=True)
-
-        if not similar_items:
-            raise frappe.DoesNotExistError("No similar items found!")
-
-        return create_response(SUCCESS, similar_items)
-
-    except frappe.DoesNotExistError as e:
-        return create_response(NOT_FOUND, str(e))
-    except Exception as e:
-        frappe.log_error(message=str(e), title="Error fetching similar items")
-        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
-
 def list_items_category(limit=8, offset=0, search=None, letter=None, category=None, min_price=None, max_price=None):
     try:
         query = """
@@ -202,7 +160,6 @@ def get_item_by_code(item_code):
     except Exception as e:
         frappe.log_error(message=str(e), title="Error fetching single item")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
 
 
 
@@ -315,4 +272,59 @@ def delete_item_by_code(item_code):
         return create_response(NOT_FOUND, str(e))
     except Exception as e:
         frappe.log_error(message=str(e), title=f"Error deleting item {item_code}")
+        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
+
+def add_to_wishlist(user_id, item_code):
+    try:
+        # Check if item is already in the wishlist
+        existing_entry = frappe.db.sql("""
+            SELECT name FROM `tabWishlist`
+            WHERE user_id = %s AND item_code = %s
+        """, (user_id, item_code), as_dict=True)
+
+        if existing_entry:
+            return create_response(SUCCESS, "Item already in wishlist.")
+
+        # Insert new item into the wishlist
+        wishlist_entry = frappe.get_doc({
+            "doctype": "Wishlist",
+            "user_id": user_id,
+            "item_code": item_code,
+            "date_added": frappe.utils.now()
+        })
+
+        wishlist_entry.insert()
+        frappe.db.commit()
+
+        return create_response(SUCCESS, "Item added to wishlist successfully.")
+
+    except Exception as e:
+        frappe.log_error(message=str(e), title="Error adding to wishlist")
+        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
+
+def remove_from_wishlist(user_id, item_code):
+    try:
+        # Check if the item exists in the wishlist
+        existing_entry = frappe.db.sql("""
+            SELECT name FROM `tabWishlist`
+            WHERE user_id = %s AND item_code = %s
+        """, (user_id, item_code), as_dict=True)
+
+        if not existing_entry:
+            return create_response(NOT_FOUND, "Item not found in wishlist.")
+
+        # Delete the wishlist item
+        frappe.db.sql("""
+            DELETE FROM `tabWishlist`
+            WHERE user_id = %s AND item_code = %s
+        """, (user_id, item_code))
+        
+        frappe.db.commit()
+
+        return create_response(SUCCESS, "Item removed from wishlist successfully.")
+
+    except Exception as e:
+        frappe.log_error(message=str(e), title="Error removing from wishlist")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
