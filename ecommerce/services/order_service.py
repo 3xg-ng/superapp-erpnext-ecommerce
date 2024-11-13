@@ -36,7 +36,7 @@ def list_orders(user_id):
 
     
 
-def create_order(shipping_address, lga, post_code, subtotal, items, discount, grand_total, payment_method, user_id, status="Drafted"):
+def create_order(shipping_address, lga, post_code, subtotal, items, discount, shipping_fee, grand_total, payment_method, user_id, status="Drafted"):
     try:
         # Verify `items` is a list of dictionaries
         if not isinstance(items, list):
@@ -68,6 +68,7 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, gr
             "post_code": post_code,
             "net_total": subtotal,
             "discount": discount,
+            "shipping_fee": shipping_fee,
             "grand_total": grand_total,
             "payment_method": payment_method,
             "user_id": user_id,
