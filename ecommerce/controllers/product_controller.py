@@ -18,7 +18,7 @@ def get_all_items(product_name=None, min_price=None, max_price=None, color=None,
 
 
 @frappe.whitelist(allow_guest=True)
-def get_product_details(item_code):
+def get_product_details(item_code=None):
     return fetch_similar_items(item_code)
 
 @frappe.whitelist(allow_guest=True)
