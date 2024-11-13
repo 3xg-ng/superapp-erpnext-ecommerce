@@ -3,21 +3,30 @@ from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR
 from ecommerce.utils.response_helper import create_response
 
 ### Get all items
-def list_items(filters=None):
+def list_items(item_code, filters=None):
     try:
+        query = """
+            SELECT category, brand, new_price
+            FROM `tabProducts`
+            WHERE item_code = %s
+        """
+        current_item = frappe.db.sql(query, (item_code,), as_dict=True)
+
+        if not current_item:
+            raise frappe.DoesNotExistError("The specified item does not exist!")
+
+        category = current_item[0]["category"]
+        brand = current_item[0]["brand"]
+        base_price = current_item[0]["new_price"]
+
         query = """
             SELECT item_code, product_name, old_price, new_price, image, rating, color, category, brand, discount
             FROM `tabProducts`
-            WHERE 1=1
+            WHERE category = %s AND brand = %s AND item_code != %s
         """
-
-        params = []
+        params = [category, brand, item_code]
 
         if filters:
-            if filters.get("product_name"):
-                query += " AND product_name LIKE %s"
-                params.append(f"%{filters['product_name']}%")
-
             if filters.get("min_price") is not None:
                 query += " AND new_price >= %s"
                 params.append(filters["min_price"])
@@ -30,14 +39,6 @@ def list_items(filters=None):
                 query += " AND color = %s"
                 params.append(filters["color"])
 
-            if filters.get("category"):
-                query += " AND category = %s"
-                params.append(filters["category"])
-
-            if filters.get("brand"):
-                query += " AND brand = %s"
-                params.append(filters["brand"])
-
             if filters.get("rating"):
                 query += " AND rating >= %s"
                 params.append(filters["rating"])
@@ -46,19 +47,20 @@ def list_items(filters=None):
                 query += " AND discount >= %s"
                 params.append(filters["discount"])
 
-        # Execute the query with parameters
-        items = frappe.db.sql(query, params, as_dict=True)
+        # Execute the query to fetch similar items
+        similar_items = frappe.db.sql(query, params, as_dict=True)
 
-        if not items:
-            raise frappe.DoesNotExistError("No items found with the specified filters!")
+        if not similar_items:
+            raise frappe.DoesNotExistError("No similar items found!")
 
-        return create_response(SUCCESS, items)
+        return create_response(SUCCESS, similar_items)
 
     except frappe.DoesNotExistError as e:
         return create_response(NOT_FOUND, str(e))
     except Exception as e:
-        frappe.log_error(message=str(e), title="Error fetching items")
+        frappe.log_error(message=str(e), title="Error fetching similar items")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
 
 
 
