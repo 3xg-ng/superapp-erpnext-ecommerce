@@ -57,8 +57,10 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, sh
                 "seller_name": item["seller_name"]
             })
 
-        # Debugging logs
+        # Debugging log to confirm the list structure
         frappe.log_error(message=f"Validated items structure: {validated_items}", title="Order Creation Items Validation")
+        if not isinstance(validated_items, list):
+            raise ValueError("validated_items must be a list.")
 
         # Create the main Order document
         sales_order = frappe.get_doc({
@@ -73,9 +75,12 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, sh
             "payment_method": payment_method,
             "user_id": user_id,
             "status": status,
-            "items": validated_items 
         })
-        
+
+        # Add items manually to the document's items field
+        for validated_item in validated_items:
+            sales_order.append("items", validated_item)
+
         sales_order.insert()
         frappe.db.commit()
 
@@ -93,7 +98,6 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, sh
     except Exception as e:
         frappe.log_error(f"Error creating order for user {user_id}: {str(e)}", "Order Creation Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
-
 
 
 def update_order(order_id, status=None, items=None):
