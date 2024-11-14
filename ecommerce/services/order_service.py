@@ -36,7 +36,7 @@ def list_orders(user_id):
 
     
 
-def create_order(shipping_address, lga, post_code, subtotal, items, discount, shipping_fee, grand_total, payment_method, user_id, status="Drafted"):
+def create_order(data):
     try:
         required_orders_keys =  ["shipping_address", "lga", "post_code", "subtotal", "items", "discount", "shipping_fee", "grand_total", "payment_method", "user_id", "status"]
         required_keys = ["item_code", "price", "quantity", "seller_name"]
@@ -67,16 +67,16 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, sh
 
         sales_order = frappe.get_doc({
             "doctype": "Order",
-            "shipping_address": shipping_address,
-            "lga": lga,
-            "post_code": post_code,
-            "net_total": subtotal,
-            "discount": discount,
-            "shipping_fee": shipping_fee,
-            "grand_total": grand_total,
-            "payment_method": payment_method,
-            "user_id": user_id,
-            "status": status,
+            "shipping_address": data["shipping_address"],
+            "lga": data["lga"],
+            "post_code": data["post_code"],
+            "net_total": data["subtotal"],
+            "discount": data["discount"],
+            "shipping_fee": data["shipping_fee"],
+            "grand_total": data["grand_total"],
+            "payment_method": data["payment_method"],
+            "user_id": data["user_id"],
+            "status": "Dafted",
             "items": validated_items
         })
         
@@ -87,15 +87,15 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, sh
         return create_response(SUCCESS, {"order_id": order_id})
 
     except ValueError as e:
-        frappe.log_error(f"Data validation error for user {user_id}: {str(e)}", "Order Creation Validation Error")
+        frappe.log_error(f"Data validation error for user {data["user_id"]}: {str(e)}", "Order Creation Validation Error")
         return create_response(BAD_REQUEST, f"Validation error: {str(e)}")
 
     except frappe.ValidationError as e:
-        frappe.log_error(f"Frappe validation error for user {user_id}: {str(e)}", "Order Creation Validation Error")
+        frappe.log_error(f"Frappe validation error for user {data["user_id"]}: {str(e)}", "Order Creation Validation Error")
         return create_response(BAD_REQUEST, f"Frappe validation error: {str(e)}")
 
     except Exception as e:
-        frappe.log_error(f"Error creating order for user {user_id}: {str(e)}", "Order Creation Error")
+        frappe.log_error(f"Error creating order for user {data["user_id"]}: {str(e)}", "Order Creation Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 
