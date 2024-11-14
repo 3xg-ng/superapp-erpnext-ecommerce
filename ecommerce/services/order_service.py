@@ -76,7 +76,7 @@ def create_order(data):
             "grand_total": data["grand_total"],
             "payment_method": data["payment_method"],
             "user_id": data["user_id"],
-            "status": "Dafted",
+            "status": "Drafted",
             "items": validated_items
         })
         
