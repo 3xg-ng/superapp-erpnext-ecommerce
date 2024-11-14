@@ -1,0 +1,289 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-10-27 21:55:23.648494",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "product_name",
+  "category",
+  "old_price",
+  "new_price",
+  "brand",
+  "image",
+  "rating",
+  "description",
+  "dimension",
+  "display_type",
+  "resolution",
+  "features",
+  "chipset",
+  "cpu",
+  "internal_memory",
+  "ram",
+  "battery_type",
+  "battery_life",
+  "charging",
+  "magsafe_charging",
+  "qi_wireless_charging",
+  "weight",
+  "color",
+  "collection",
+  "quantity",
+  "availability",
+  "model",
+  "seller_performance",
+  "warranty",
+  "seller_name",
+  "discount"
+ ],
+ "fields": [
+  {
+   "fieldname": "product_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Product Name"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Category",
+   "options": "Item Group",
+   "reqd": 1
+  },
+  {
+   "fieldname": "old_price",
+   "fieldtype": "Int",
+   "label": "Old Price"
+  },
+  {
+   "fieldname": "new_price",
+   "fieldtype": "Int",
+   "label": "New Price"
+  },
+  {
+   "fieldname": "brand",
+   "fieldtype": "Link",
+   "label": "Brand",
+   "options": "Brand"
+  },
+  {
+   "fieldname": "image",
+   "fieldtype": "Attach Image",
+   "label": "Image",
+   "options": "image"
+  },
+  {
+   "fieldname": "rating",
+   "fieldtype": "Data",
+   "label": "Rating"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "Description"
+  },
+  {
+   "fieldname": "dimension",
+   "fieldtype": "Data",
+   "label": "Dimension"
+  },
+  {
+   "fieldname": "resolution",
+   "fieldtype": "Data",
+   "label": "Resolution"
+  },
+  {
+   "fieldname": "features",
+   "fieldtype": "Data",
+   "label": "Features"
+  },
+  {
+   "fieldname": "chipset",
+   "fieldtype": "Data",
+   "label": "Chipset"
+  },
+  {
+   "fieldname": "cpu",
+   "fieldtype": "Data",
+   "label": "CPU"
+  },
+  {
+   "fieldname": "internal_memory",
+   "fieldtype": "Data",
+   "label": "Internal Memory"
+  },
+  {
+   "fieldname": "ram",
+   "fieldtype": "Data",
+   "label": "RAM"
+  },
+  {
+   "fieldname": "battery_type",
+   "fieldtype": "Data",
+   "label": "Battery Type"
+  },
+  {
+   "fieldname": "battery_life",
+   "fieldtype": "Data",
+   "label": "Battery Life"
+  },
+  {
+   "fieldname": "charging",
+   "fieldtype": "Data",
+   "label": "Charging"
+  },
+  {
+   "fieldname": "magsafe_charging",
+   "fieldtype": "Data",
+   "label": "MagSafe Wireless Charging"
+  },
+  {
+   "fieldname": "qi_wireless_charging",
+   "fieldtype": "Data",
+   "label": "Qi Wireless Charging"
+  },
+  {
+   "fieldname": "color",
+   "fieldtype": "Data",
+   "label": "Color"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Data",
+   "label": "Quantity"
+  },
+  {
+   "fieldname": "availability",
+   "fieldtype": "Data",
+   "label": "Availability"
+  },
+  {
+   "fieldname": "model",
+   "fieldtype": "Link",
+   "label": "Model",
+   "options": "Asset Category"
+  },
+  {
+   "fieldname": "collection",
+   "fieldtype": "Data",
+   "label": "Collection"
+  },
+  {
+   "fieldname": "weight",
+   "fieldtype": "Data",
+   "label": "Weight"
+  },
+  {
+   "fieldname": "seller_performance",
+   "fieldtype": "Link",
+   "label": "Seller Performance",
+   "options": "Seller Performance"
+  },
+  {
+   "fieldname": "warranty",
+   "fieldtype": "Text Editor",
+   "label": "Warranty"
+  },
+  {
+   "fieldname": "display_type",
+   "fieldtype": "Data",
+   "label": "Display Type"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item Code",
+   "reqd": 1
+  },
+  {
+   "fieldname": "seller_name",
+   "fieldtype": "Data",
+   "label": "Seller Name"
+  },
+  {
+   "fieldname": "discount",
+   "fieldtype": "Float",
+   "label": "Discount"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-11-11 23:31:25.939235",
+ "modified_by": "Administrator",
+ "module": "Ecommerce",
+ "name": "Products",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Item Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -38,22 +38,32 @@ def list_orders(user_id):
 
 def create_order(shipping_address, lga, post_code, subtotal, items, discount, shipping_fee, grand_total, payment_method, user_id, status="Drafted"):
     try:
+        required_orders_keys =  ["shipping_address", "lga", "post_code", "subtotal", "items", "discount", "shipping_fee", "grand_total", "payment_method", "user_id", "status"]
+        required_keys = ["item_code", "price", "quantity", "seller_name"]
+        if not all (key in data for  key in required_orders_keys):
+            raise ValueError("missing required order data")
+        items  = ["data"]
         if not isinstance(items, list) or not all(isinstance(item, dict) for item in items):
             raise ValueError("Items must be a list of dictionaries.")
 
         validated_items = []
         for item in items:
-            required_keys = ["item_code", "price", "quantity", "seller_name"]
-            if not all(key in item and item[key] is not None for key in required_keys):
+            if not all(key in item for  key in required_keys):
                 raise ValueError("Each item must include item_code, price, quantity, and seller_name.")
-
             validated_items.append({
                 "doctype": "Order Item",
                 "item_code": item["item_code"],
                 "price": item["price"],
                 "quantity": item["quantity"],
-                "seller_name": item["seller_name"]
-            })
+                "seller_name": item["seller_name"]           
+                })
+       # for item in items:
+            #required_keys = ["item_code", "price", "quantity", "seller_name"]
+           # if not all(key in item and item[key] is not None for key in required_keys):
+               # raise ValueError("Each item must include item_code, price, quantity, and seller_name.")
+
+
+           
 
         sales_order = frappe.get_doc({
             "doctype": "Order",
