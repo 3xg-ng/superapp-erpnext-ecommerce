@@ -3,9 +3,6 @@ from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR
 from ecommerce.utils.response_helper import create_response
 
 ### Get all items
-
-
-
 def add_to_wishlist(user_id, item_code):
     try:
         # Check if item is already in the wishlist
