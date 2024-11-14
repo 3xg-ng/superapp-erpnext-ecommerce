@@ -1,7 +1,6 @@
 import frappe
 from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR, BAD_REQUEST
 from ecommerce.utils.response_helper import create_response
-from datetime import datetime
 
 ### Function to List All Orders for a User
 def list_orders(user_id):
