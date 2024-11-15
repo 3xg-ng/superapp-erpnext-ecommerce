@@ -1,4 +1,5 @@
 import frappe
+import requests
 from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR
 from ecommerce.utils.response_helper import create_response
 
@@ -25,12 +26,11 @@ def list_cart_items(user_id):
 
 
 
-import requests
 
 def add_to_cart(user_id, item_code):
     try:
         response = requests.get(
-            f"https://api.example.com/products/{item_code}",
+            f"http://3.92.217.72:8000/api/method/ecommerce.controllers.product_controller.get_all_items/products/{item_code}",
             headers={"Authorization": f"Token 9a5d3ea083f7bd9:231ba95d3293763"}
         )
 
