@@ -25,18 +25,21 @@ def list_cart_items(user_id):
 
 
 
+import requests
+
 def add_to_cart(user_id, item_code):
     try:
-        product_details = frappe.db.get_value(
-            "Products", 
-            {"item_code": item_code}, 
-            ["product_name", "new_price", "image", "seller_name"], 
-            as_dict=True
+        response = requests.get(
+            f"https://api.example.com/products/{item_code}",
+            headers={"Authorization": f"Token 9a5d3ea083f7bd9:231ba95d3293763"}
         )
 
-        if not product_details:
+        if response.status_code != 200:
             return create_response(NOT_FOUND, "Product not found.")
 
+        product_details = response.json()
+
+        # Continue with Frappe database operations
         cart_item = frappe.db.get_value("Cart", {"user_id": user_id, "item_code": item_code}, ["quantity", "name"])
 
         if cart_item:
@@ -65,7 +68,6 @@ def add_to_cart(user_id, item_code):
     except Exception as e:
         frappe.log_error(f"Error adding item {item_code} to cart for user {user_id}: {str(e)}", "Add to Cart Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred while adding the item: {str(e)}")
-
 
 
 def update_cart_quantity(user_id, item_code, quantity):
