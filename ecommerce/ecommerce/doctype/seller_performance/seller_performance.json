@@ -1,0 +1,48 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-10-28 01:03:22.577534",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "user_id",
+  "store_rating",
+  "order_fulfillment",
+  "positive_review"
+ ],
+ "fields": [
+  {
+   "fieldname": "user_id",
+   "fieldtype": "Data",
+   "label": "User ID"
+  },
+  {
+   "fieldname": "store_rating",
+   "fieldtype": "Data",
+   "label": "Store Rating"
+  },
+  {
+   "fieldname": "order_fulfillment",
+   "fieldtype": "Data",
+   "label": "Order Fulfillment "
+  },
+  {
+   "fieldname": "positive_review",
+   "fieldtype": "Data",
+   "label": "Positive Review"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-10-28 01:03:22.577534",
+ "modified_by": "Administrator",
+ "module": "Ecommerce",
+ "name": "Seller Performance",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
