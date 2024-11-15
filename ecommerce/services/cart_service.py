@@ -1,5 +1,4 @@
 import frappe
-import requests
 from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR
 from ecommerce.utils.response_helper import create_response
 
@@ -15,31 +14,30 @@ def list_cart_items(user_id):
         items = frappe.db.sql(query, user_id, as_dict=True)
 
         if not items:
-            return create_response(SUCCESS, [])
+            raise frappe.DoesNotExistError("No items found for this user!")
 
         return create_response(SUCCESS, items)
 
+    except frappe.DoesNotExistError as e:
+        return create_response(NOT_FOUND, str(e))
     except Exception as e:
         frappe.log_error(message=str(e), title="Error fetching items")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 
 
-
-
 def add_to_cart(user_id, item_code):
     try:
-        response = requests.get(
-            f"http://3.92.217.72:8000/api/method/ecommerce.controllers.product_controller.get_all_items/products/{item_code}",
-            headers={"Authorization": f"Token 9a5d3ea083f7bd9:231ba95d3293763"}
+        product_details = frappe.db.get_value(
+            "Products", 
+            {"item_code": item_code}, 
+            ["product_name", "new_price", "image", "seller_name"], 
+            as_dict=True
         )
 
-        if response.status_code != 200:
+        if not product_details:
             return create_response(NOT_FOUND, "Product not found.")
 
-        product_details = response.json()
-
-        # Continue with Frappe database operations
         cart_item = frappe.db.get_value("Cart", {"user_id": user_id, "item_code": item_code}, ["quantity", "name"])
 
         if cart_item:
@@ -68,6 +66,7 @@ def add_to_cart(user_id, item_code):
     except Exception as e:
         frappe.log_error(f"Error adding item {item_code} to cart for user {user_id}: {str(e)}", "Add to Cart Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred while adding the item: {str(e)}")
+
 
 
 def update_cart_quantity(user_id, item_code, quantity):
