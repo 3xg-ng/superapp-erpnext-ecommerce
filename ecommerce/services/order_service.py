@@ -36,14 +36,14 @@ def list_orders(user_id):
 
     
 
-def create_order(shipping_address, lga, post_code, subtotal, items, discount, shipping_fee, grand_total, payment_method, user_id):
+def create_order(shipping_address, lga, post_code, subtotal, items, discount, shipping_fee, grand_total, payment_method, user_id, status):
     try:
         required_orders_keys = ["shipping_address", "lga", "post_code", "subtotal", "items", "discount", "shipping_fee", "grand_total", "payment_method", "user_id", "status"]
         required_keys = ["item_code", "price", "quantity", "seller_name"]
         
         # Check if all required order keys are present in data
-        if not all(key in locals() for key in required_orders_keys):
-            raise ValueError("Missing required order data")
+        #if not all(key in locals() for key in required_orders_keys):
+            #raise ValueError("Missing required order data")
         
         # Ensure items is a list of dictionaries
         if not isinstance(items, list) or not all(isinstance(item, dict) for item in items):
