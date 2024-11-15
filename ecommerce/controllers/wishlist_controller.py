@@ -1,10 +1,6 @@
-
+import frappe
 from ecommerce.services.wishlist_service import add_to_wishlist, remove_from_wishlist, get_wishlist
     
-
-
-
-
 
 @frappe.whitelist(allow_guest=True)
 def add_wishlist(user_id, item_code):
