@@ -38,29 +38,36 @@ def add_to_wishlist(user_id, item_code):
         return create_response(SERVER_ERROR, f"An unexpected error occurred while adding the item: {str(e)}")
 
 
-def remove_from_wishlist(user_id, item_code):
+def remove_from_wishlist(user_id, item_code=None):
     try:
-        # Check if the item exists in the wishlist
-        existing_entry = frappe.db.sql("""
-            SELECT name FROM `tabProductWishlist`
-            WHERE user_id = %s AND item_code = %s
-        """, (user_id, item_code), as_dict=True)
+        if item_code:
+            if not frappe.db.exists("ProductWishlist", {"user_id": user_id, "item_code": item_code}):
+                return create_response(NOT_FOUND, f"Item {item_code} not found in cart for user {user_id}.")
+        else:
+            if not frappe.db.exists("ProductWishlist", {"user_id": user_id}):
+                return create_response(NOT_FOUND, f"Wishlist not found for user {user_id}.")
 
-        if not existing_entry:
-            return create_response(NOT_FOUND, "Item not found in wishlist.")
+        if item_code:
+            frappe.db.sql("""
+                DELETE FROM `tabProductWishlist`
+                WHERE user_id = %s AND item_code = %s
+            """, (user_id, item_code))
+            message = f"Item {item_code} deleted from cart for user {user_id}."
+        else:
+            frappe.db.sql("""
+                DELETE FROM `tabProductWishlist`
+                WHERE user_id = %s
+            """, (user_id,))
+            message = f"Wishlist for user {user_id} deleted successfully!"
 
-        # Delete the wishlist item
-        frappe.db.sql("""
-            DELETE FROM `tabProductWishlist`
-            WHERE user_id = %s AND item_code = %s
-        """, (user_id, item_code))
-        
         frappe.db.commit()
+        return create_response(SUCCESS, message)
 
-        return create_response(SUCCESS, "Item removed from wishlist successfully.")
-
+    except frappe.DoesNotExistError as e:
+        frappe.log_error(f"Item or Wishlist does not exist: {str(e)}", "Delete Wishlist Error")
+        return create_response(NOT_FOUND, "Wishlist item or Wishlist does not exist.")
     except Exception as e:
-        frappe.log_error(message=str(e), title="Error removing from wishlist")
+        frappe.log_error(f"Error deleting Wishlist or item for user {user_id}: {str(e)}", "Delete Wishlist Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 
