@@ -15,8 +15,6 @@ def add_to_wishlist(user_id, item_code):
         if not product_details:
             return create_response(NOT_FOUND, "Product not found.")
 
-        wishlist_item = frappe.db.get_value("ProductWishlist", {"user_id": user_id, "item_code": item_code})
-
         
         new_wishlist_item = frappe.get_doc({
                 "doctype": "ProductWishlist",

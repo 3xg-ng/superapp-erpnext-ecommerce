@@ -12,5 +12,5 @@ def remove_wishlist(user_id, item_code):
 
 
 @frappe.whitelist(allow_guest=True)
-def get_whishlist_item(user_id):
+def get_wishlist_item(user_id):
     return get_wishlist(user_id)
