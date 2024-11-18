@@ -73,18 +73,21 @@ def remove_from_wishlist(user_id, item_code=None):
 
 def get_wishlist(user_id):
     try:
-        wishlist_items = frappe.db.sql("""
-            SELECT w.name, w.item_code, p.product_name, p.new_price, p.image
+        query = """
+            SELECT *
             FROM `tabProductWishlist`
-            LEFT JOIN `tabProducts` p ON w.item_code = p.item_code
-            WHERE w.user_id = %s
-        """, (user_id,), as_dict=True)
+            WHERE user_id = %s
+        """
+        
+        items = frappe.db.sql(query, user_id, as_dict=True)
 
-        if not wishlist_items:
-            return create_response(NOT_FOUND, "No items found in wishlist.")
+        if not items:
+            raise frappe.DoesNotExistError("No items found for this user!")
 
-        return create_response(SUCCESS, wishlist_items)
+        return create_response(SUCCESS, items)
 
+    except frappe.DoesNotExistError as e:
+        return create_response(NOT_FOUND, str(e))
     except Exception as e:
-        frappe.log_error(message=str(e), title="Error fetching wishlist")
+        frappe.log_error(message=str(e), title="Error fetching items")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
