@@ -32,8 +32,8 @@ def get_single_item():
     return list_single_item()
 
 @frappe.whitelist(allow_guest=True)
-def add_item(item_code, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty):
-    return add_new_item(item_code, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty)
+def add_item(item_code, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, qi_wireless_charging, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty):
+    return add_new_item(item_code, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, qi_wireless_charging, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty)
 
 @frappe.whitelist(allow_guest=True)
 def update_item_by_code(item_code, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty):
