@@ -10,7 +10,7 @@ def get_orders(user_id):
 
 @frappe.whitelist(allow_guest=True)
 def create_new_order(data):
-    return data
+    return "Taiwo"
     # return create_order(data)
 
 
