@@ -186,7 +186,7 @@ def get_item_by_code(item_code):
 
 
 ### Add new item
-def add_new_item(item_code, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty):
+def add_new_item(item_code, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, qi_wireless_charging, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty):
     
     try:
         if frappe.db.exists("Products", {"item_code": item_code}):
@@ -205,6 +205,7 @@ def add_new_item(item_code, product_name, category, old_price, new_price, image,
             "description": description,
             "dimension": dimension,
             "display_type": display_type,
+            "qi_wireless_charging": qi_wireless_charging,
             "resolution": resolution,
             "features": features,
             "chipset": chipset,
