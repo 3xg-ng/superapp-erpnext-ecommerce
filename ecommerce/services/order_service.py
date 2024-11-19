@@ -37,19 +37,13 @@ def list_orders(user_id):
 
 def create_order(shipping_address, lga, post_code, subtotal, items, discount, shipping_fee, grand_total, payment_method, user_id, status):
     try:
-        required_orders_keys = ["shipping_address", "lga", "post_code", "subtotal", "items", "discount", "shipping_fee", "grand_total", "payment_method", "user_id", "status"]
         required_keys = ["item_code", "price", "quantity", "seller_name"]
         
-        # Check if all required order keys are present in data
-        #if not all(key in locals() for key in required_orders_keys):
-            #raise ValueError("Missing required order data")
-        
-        # Ensure items is a list of dictionaries
         if not isinstance(items, list) or not all(isinstance(item, dict) for item in items):
             raise ValueError("Items must be a list of dictionaries.")
 
         validated_items = []
-        # Validate each item
+        
         for item in items:
             if not all(key in item for key in required_keys):
                 raise ValueError("Each item must include item_code, price, quantity, and seller_name.")
@@ -61,7 +55,6 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, sh
                 "seller_name": item["seller_name"]
             })
 
-        # Create the sales order document
         sales_order = frappe.get_doc({
             "doctype": "Order",
             "shipping_address": shipping_address,
@@ -77,11 +70,9 @@ def create_order(shipping_address, lga, post_code, subtotal, items, discount, sh
             "items": validated_items
         })
         
-        # Insert and commit the sales order
         sales_order.insert()
         frappe.db.commit()
 
-        # Return the order ID
         order_id = sales_order.name
         return create_response(SUCCESS, {"order_id": order_id})
 
