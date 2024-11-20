@@ -40,7 +40,7 @@ def remove_from_wishlist(user_id, item_code=None):
     try:
         if item_code:
             if not frappe.db.exists("ProductWishlist", {"user_id": user_id, "item_code": item_code}):
-                return create_response(NOT_FOUND, f"Item {item_code} not found in cart for user {user_id}.")
+                return create_response(NOT_FOUND, f"Item {item_code} not found in wishlist for user {user_id}.")
         else:
             if not frappe.db.exists("ProductWishlist", {"user_id": user_id}):
                 return create_response(NOT_FOUND, f"Wishlist not found for user {user_id}.")
@@ -50,7 +50,7 @@ def remove_from_wishlist(user_id, item_code=None):
                 DELETE FROM `tabProductWishlist`
                 WHERE user_id = %s AND item_code = %s
             """, (user_id, item_code))
-            message = f"Item {item_code} deleted from cart for user {user_id}."
+            message = f"Item {item_code} deleted from wishlist for user {user_id}."
         else:
             frappe.db.sql("""
                 DELETE FROM `tabProductWishlist`
