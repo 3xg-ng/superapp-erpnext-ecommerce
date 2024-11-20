@@ -15,7 +15,7 @@ def get_banner_a():
         items = frappe.db.sql(query, as_dict=True)
 
         if not items:
-            raise frappe.DoesNotExistError("No items found!")
+            raise create_response(SUCCESS, [])
 
         return create_response(SUCCESS, items)
 
