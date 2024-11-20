@@ -62,7 +62,7 @@ def list_items(filters=None):
 
 
 
-def similar_products(item_code):
+def list_similar_products(item_code):
     try:
         current_product = frappe.get_doc('Products', item_code)
         if not current_product:
