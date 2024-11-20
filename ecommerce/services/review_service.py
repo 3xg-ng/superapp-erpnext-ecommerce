@@ -14,8 +14,8 @@ def create_product_review(item_code, user_id, rating, comment):
         
         review = frappe.get_doc({
             "doctype": "Product Review",
-            "product": item_code,
-            "user": user_id,
+            "item_code": item_code,
+            "user_id": user_id,
             "rating": rating,
             "comment": comment,
             "status": "Pending"
