@@ -19,7 +19,8 @@ def get_all_items(product_name=None, min_price=None, max_price=None, color=None,
 
 @frappe.whitelist(allow_guest=True)
 def get_all_items_by_category_limit():
-    return list_items_category()
+    # return list_items_category()
+    return "Hello World!"
 
 
 @frappe.whitelist(allow_guest=True)
