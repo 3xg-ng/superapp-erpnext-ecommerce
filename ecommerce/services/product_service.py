@@ -50,7 +50,7 @@ def list_items(filters=None):
         items = frappe.db.sql(query, params, as_dict=True)
 
         if not items:
-            raise frappe.DoesNotExistError("No items found with the specified filters!")
+            return create_response(SUCCESS, [])
 
         return create_response(SUCCESS, items)
 
@@ -59,6 +59,45 @@ def list_items(filters=None):
     except Exception as e:
         frappe.log_error(message=str(e), title="Error fetching items")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
+
+
+def similar_products(item_code):
+    try:
+        current_product = frappe.get_doc('Products', item_code)
+        if not current_product:
+            frappe.throw(f"Product with ID {item_code} not found.")
+        
+        similar_products = frappe.db.sql("""
+            SELECT 
+                *
+            FROM 
+                `tabProducts`
+            WHERE 
+                item_code != %(item_code)s AND
+                category = %(category)s AND
+                brand = %(brand)s AND
+                new_price BETWEEN %(min_price)s AND %(max_price)s
+            ORDER BY 
+                rating DESC
+            LIMIT 10
+        """, {
+            "item_code": item_code,
+            "category": current_product.category,
+            "brand": current_product.brand,
+            "min_price": current_product.new_price * 0.8,
+            "max_price": current_product.new_price * 1.2
+        }, as_dict=True)
+        
+        return create_response(SUCCESS, similar_products)
+    
+    except frappe.DoesNotExistError as e:
+        return create_response(NOT_FOUND, str(e))
+    except Exception as e:
+        frappe.log_error(message=str(e), title="Error fetching similar products")
+        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
+
 
 
 def list_items_category(limit=8, offset=0, search=None, letter=None, category=None, min_price=None, max_price=None):
