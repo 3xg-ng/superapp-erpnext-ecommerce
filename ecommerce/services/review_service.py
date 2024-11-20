@@ -10,8 +10,8 @@ def create_product_review(item_code, user_id, rating, comment):
                 BAD_REQUEST, "Rating must be a valid float between 1 and 5."
             )
         
-        product = frappe.db.get_value(
-            "Products", {"item_code": item_code}, ["item_code"], as_dict=True
+        product = frappe.db.get_doc(
+            "Products", {"item_code": item_code}
         )
         
         if not product:
@@ -19,7 +19,7 @@ def create_product_review(item_code, user_id, rating, comment):
         
         review = frappe.get_doc({
             "doctype": "Product Review",
-            "item_code": product["item_code"],
+            "item_code": item_code,
             "user_id": user_id,
             "rating": float(rating), 
             "comment": comment,
