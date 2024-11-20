@@ -8,13 +8,17 @@ def create_product_review(item_code, user_id, rating, comment):
         if not (1 <= int(rating) <= 5):
             frappe.throw("Rating must be between 1 and 5.")
         
-        product = frappe.get_doc("Products", item_code)
+        product = frappe.db.get_value(
+            "Products", 
+            {"item_code": item_code},
+            as_dict=True
+        )
         if not product:
-            frappe.throw(f"Product with item_code {item_code} does not exist.")
+            return create_response(NOT_FOUND, "Product not found.")
         
         review = frappe.get_doc({
             "doctype": "Product Review",
-            "item_code": item_code,
+            "item_code": product["item_code"],
             "user_id": user_id,
             "rating": rating,
             "comment": comment,
