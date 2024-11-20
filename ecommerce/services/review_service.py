@@ -10,7 +10,7 @@ def create_product_review(item_code, user_id, rating, comment):
         
         product = frappe.get_doc("Products", item_code)
         if not product:
-            frappe.throw(f"Product with ID {item_code} does not exist.")
+            frappe.throw(f"Product with item_code {item_code} does not exist.")
         
         review = frappe.get_doc({
             "doctype": "Product Review",
@@ -23,14 +23,14 @@ def create_product_review(item_code, user_id, rating, comment):
         review.insert()
         frappe.db.commit()
         
-        # Return success response
         return create_response(SUCCESS, {"message": "Review submitted successfully and is pending approval."})
 
     except frappe.DoesNotExistError as e:
-        return create_response(NOT_FOUND, str(e))
+        return create_response(NOT_FOUND, f"Product with item_code {item_code} not found.")
     except Exception as e:
         frappe.log_error(message=str(e), title="Error creating product review")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
 
 
 def list_reviews(item_code):
