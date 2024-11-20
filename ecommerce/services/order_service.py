@@ -35,7 +35,7 @@ def list_orders(user_id):
 
     
 
-def create_order(shipping_address, lga, post_code, subtotal, items, discount, shipping_fee, grand_total, payment_method, user_id, status):
+def create_order(user_id, subtotal, shipping_address, post_code, lga, discount, shipping_fee, grand_total, payment_method, status, items):
     try:
         required_keys = ["item_code", "price", "quantity", "seller_name"]
         
