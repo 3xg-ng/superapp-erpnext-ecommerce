@@ -42,18 +42,17 @@ def list_reviews(item_code):
         query = """
             SELECT user_id, rating, comment
             FROM `tabProduct Review`
-            WHERE 1=1
+            WHERE item_code = %s
         """
         
-        reviews = frappe.db.sql(query, item_code, as_dict=True)
+        reviews = frappe.db.sql(query, (item_code,), as_dict=True)
 
         if not reviews:
-            raise create_response(SUCCESS, [])
+            return create_response(SUCCESS, [])
 
         return create_response(SUCCESS, reviews)
 
-    except frappe.DoesNotExistError as e:
-        return create_response(NOT_FOUND, str(e))
     except Exception as e:
         frappe.log_error(message=str(e), title="Error fetching reviews")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
