@@ -8,5 +8,5 @@ def get_review(item_code):
 
 
 @frappe.whitelist(allow_guest=True)
-def add_review(user_id, item_code, rating, comment):
-    return create_product_review(user_id, item_code, rating, comment)
+def add_review(item_code, user_id, rating, comment):
+    return create_product_review(item_code, user_id, rating, comment)
