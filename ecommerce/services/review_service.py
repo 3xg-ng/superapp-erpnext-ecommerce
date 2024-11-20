@@ -40,9 +40,9 @@ def create_product_review(item_code, user_id, rating, comment):
 def list_reviews(item_code):
     try:
         query = """
-            SELECT *
+            SELECT user_id, rating, comment
             FROM `tabProduct Review`
-            WHERE item_code = %s
+            WHERE 1=1
         """
         
         reviews = frappe.db.sql(query, item_code, as_dict=True)
