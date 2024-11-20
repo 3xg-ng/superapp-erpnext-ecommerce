@@ -3,8 +3,8 @@ import frappe
 from ecommerce.services.review_service import create_product_review, list_reviews
 
 @frappe.whitelist(allow_guest=True)
-def get_review(user_id):
-    return list_reviews(user_id)
+def get_review(item_code):
+    return list_reviews(item_code)
 
 
 @frappe.whitelist(allow_guest=True)
