@@ -90,55 +90,90 @@ def create_order(user_id, subtotal, shipping_address, post_code, lga, discount, 
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 
-def update_order(order_id, status=None, items=None):
-    
+def update_order(order_id, user_id, subtotal, shipping_address, post_code, lga, discount, shipping_fee, grand_total, payment_method, status, items):
     try:
-        order = frappe.get_doc("Order", order_id)
+        required_keys = ["item_code", "price", "quantity", "seller_name"]
 
-        if status:
-            order.status = status
+        if not isinstance(items, list) or not all(isinstance(item, dict) for item in items):
+            raise ValueError("Items must be a list of dictionaries.")
 
-        if items:
-            order.items = [] 
-            for item in items:
-                order.append("items", {
-                    "item_code": item["item_code"],
-                    "item_name": item["item_name"],
-                    "qty": item["qty"],
-                    "rate": item["rate"],
-                    "amount": item["amount"]
-                })
+        validated_items = []
 
-        order.save()
+        for item in items:
+            if not all(key in item for key in required_keys):
+                raise ValueError("Each item must include item_code, price, quantity, and seller_name.")
+            validated_items.append({
+                "doctype": "Order Item",
+                "item_code": item["item_code"],
+                "price": item["price"],
+                "quantity": item["quantity"],
+                "seller_name": item["seller_name"],
+                "user_id": item["user_id"]
+            })
+
+        sales_order = frappe.get_doc("Order", order_id)
+
+        sales_order.update({
+            "shipping_address": shipping_address,
+            "lga": lga,
+            "post_code": post_code,
+            "net_total": subtotal,
+            "discount": discount,
+            "shipping_fee": shipping_fee,
+            "grand_total": grand_total,
+            "payment_method": payment_method,
+            "user_id": user_id,
+            "status": status,
+            "items": validated_items
+        })
+
+        sales_order.save(ignore_permissions=True)
         frappe.db.commit()
 
-        return create_response(SUCCESS, f"Order {order_id} updated successfully!")
+        return create_response(SUCCESS, {"order_id": sales_order.name, "message": "Order updated successfully"})
 
     except frappe.DoesNotExistError:
-        return create_response(NOT_FOUND, f"Order {order_id} not found!")
+        frappe.log_error(f"Order {order_id} not found for user {user_id}", "Order Update Error")
+        return create_response(NOT_FOUND, f"Order with ID {order_id} does not exist.")
+
+    except ValueError as e:
+        frappe.log_error(f"Data validation error for order {order_id} and user {user_id}: {str(e)}", "Order Update Validation Error")
+        return create_response(BAD_REQUEST, f"Validation error: {str(e)}")
+
+    except frappe.ValidationError as e:
+        frappe.log_error(f"Frappe validation error for order {order_id} and user {user_id}: {str(e)}", "Order Update Validation Error")
+        return create_response(BAD_REQUEST, f"Frappe validation error: {str(e)}")
 
     except Exception as e:
-        frappe.log_error(f"Error updating order {order_id}: {str(e)}", "Update Order Error")
+        frappe.log_error(f"Error updating order {order_id} for user {user_id}: {str(e)}", "Order Update Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 
-def delete_order(order_id):
-    """
-    Delete an existing order by its ID.
 
-    :param order_id: The ID of the order to be deleted.
-    :return: JSON response indicating success or error.
-    """
+def delete_order(order_id, user_id):
     try:
-        order = frappe.get_doc("Sales Order", order_id)
-        order.delete()
+        sales_order = frappe.get_doc("Order", order_id)
+
+        if sales_order.user_id != user_id:
+            raise ValueError(f"User {user_id} is not authorized to delete order {order_id}.")
+
+        sales_order.delete()
         frappe.db.commit()
 
-        return create_response(SUCCESS, f"Order {order_id} deleted successfully!")
+        return create_response(SUCCESS, {"order_id": order_id, "message": "Order deleted successfully"})
 
     except frappe.DoesNotExistError:
-        return create_response(NOT_FOUND, f"Order {order_id} not found!")
+        frappe.log_error(f"Order {order_id} not found for user {user_id}", "Order Deletion Error")
+        return create_response(NOT_FOUND, f"Order with ID {order_id} does not exist.")
+
+    except ValueError as e:
+        frappe.log_error(f"Validation error for order {order_id} and user {user_id}: {str(e)}", "Order Deletion Validation Error")
+        return create_response(BAD_REQUEST, f"Validation error: {str(e)}")
+
+    except frappe.ValidationError as e:
+        frappe.log_error(f"Frappe validation error for order {order_id} and user {user_id}: {str(e)}", "Order Deletion Validation Error")
+        return create_response(BAD_REQUEST, f"Frappe validation error: {str(e)}")
 
     except Exception as e:
-        frappe.log_error(f"Error deleting order {order_id}: {str(e)}", "Delete Order Error")
+        frappe.log_error(f"Error deleting order {order_id} for user {user_id}: {str(e)}", "Order Deletion Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")

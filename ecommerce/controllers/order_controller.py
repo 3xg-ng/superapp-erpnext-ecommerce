@@ -25,8 +25,19 @@ def create_new_order(**kwargs):
 
 
 @frappe.whitelist(allow_guest=True)
-def modify_order(order_id, status,  item_name, quantity):
-    return update_order(order_id, status,  item_name, quantity)
+def modify_order(**kwargs):
+    user_id= kwargs.get("user_id") 
+    subtotal= kwargs.get("subtotal") 
+    shipping_address= kwargs.get("shipping_address") 
+    post_code= kwargs.get("post_code") 
+    lga= kwargs.get("lga") 
+    discount= kwargs.get("discount") 
+    shipping_fee= kwargs.get("shipping_fee") 
+    grand_total= kwargs.get("grand_total") 
+    payment_method= kwargs.get("payment_method") 
+    status= kwargs.get("status") 
+    items= kwargs.get("items")
+    return update_order(user_id, subtotal, shipping_address, post_code, lga, discount, shipping_fee, grand_total, payment_method, status, items)
 
 
 @frappe.whitelist(allow_guest=True)
