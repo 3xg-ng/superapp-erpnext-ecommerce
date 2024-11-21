@@ -150,30 +150,48 @@ def update_order(order_id, user_id, subtotal, shipping_address, post_code, lga, 
 
 
 
-def delete_order(order_id, user_id):
+
+def delete_order(user_id, item_code=None):
     try:
-        sales_order = frappe.get_doc("Order", order_id)
+        if item_code:
+            if not frappe.db.exists("Order", {"user_id": user_id, "name": item_code}):
+                return create_response(NOT_FOUND, f"Item {item_code} not found in order for user {user_id}.")
+        else:
+            if not frappe.db.exists("Order", {"user_id": user_id}):
+                return create_response(NOT_FOUND, f"Order not found for user {user_id}.")
 
-        if sales_order.user_id != user_id:
-            raise ValueError(f"User {user_id} is not authorized to delete order {order_id}.")
+        if item_code:
+            frappe.db.sql("""
+                DELETE FROM `tabOrder`
+                WHERE user_id = %s AND name = %s
+            """, (user_id, item_code))
+            message = f"Item {item_code} deleted from order for user {user_id}."
+        else:
+            frappe.db.sql("""
+                DELETE FROM `tabOrder`
+                WHERE user_id = %s
+            """, (user_id,))
+            message = f"Order for user {user_id} deleted successfully!"
+            
+        if item_code:
+            frappe.db.sql("""
+                DELETE FROM `tabOrder Item`
+                WHERE user_id = %s AND item_code = %s
+            """, (user_id, item_code))
+            message = f"Item {item_code} deleted from order for user {user_id}."
+        else:
+            frappe.db.sql("""
+                DELETE FROM `tabOrder Item`
+                WHERE user_id = %s
+            """, (user_id,))
+            message = f"Order for user {user_id} deleted successfully!"
 
-        sales_order.delete()
         frappe.db.commit()
+        return create_response(SUCCESS, message)
 
-        return create_response(SUCCESS, {"order_id": order_id, "message": "Order deleted successfully"})
-
-    except frappe.DoesNotExistError:
-        frappe.log_error(f"Order {order_id} not found for user {user_id}", "Order Deletion Error")
-        return create_response(NOT_FOUND, f"Order with ID {order_id} does not exist.")
-
-    except ValueError as e:
-        frappe.log_error(f"Validation error for order {order_id} and user {user_id}: {str(e)}", "Order Deletion Validation Error")
-        return create_response(BAD_REQUEST, f"Validation error: {str(e)}")
-
-    except frappe.ValidationError as e:
-        frappe.log_error(f"Frappe validation error for order {order_id} and user {user_id}: {str(e)}", "Order Deletion Validation Error")
-        return create_response(BAD_REQUEST, f"Frappe validation error: {str(e)}")
-
+    except frappe.DoesNotExistError as e:
+        frappe.log_error(f"Item or order does not exist: {str(e)}", "Delete Order Error")
+        return create_response(NOT_FOUND, "Order item or order does not exist.")
     except Exception as e:
-        frappe.log_error(f"Error deleting order {order_id} for user {user_id}: {str(e)}", "Order Deletion Error")
+        frappe.log_error(f"Error deleting order or item for user {user_id}: {str(e)}", "Delete Order Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
