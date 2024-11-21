@@ -131,7 +131,7 @@ def update_order(order_id, user_id, subtotal, shipping_address, post_code, lga, 
         sales_order.save(ignore_permissions=True)
         frappe.db.commit()
 
-        return create_response(SUCCESS, {"order_id": sales_order.name, "message": "Order updated successfully"})
+        return create_response(SUCCESS, {"order_id": order_id, "message": "Order updated successfully"})
 
     except frappe.DoesNotExistError:
         frappe.log_error(f"Order {order_id} not found for user {user_id}", "Order Update Error")
