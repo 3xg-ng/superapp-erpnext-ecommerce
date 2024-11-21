@@ -17,7 +17,7 @@ def list_orders(user_id):
 
         cart_query = """
             SELECT item_code, quantity, price, seller_name
-            FROM `tabCart`
+            FROM `tabOrder Item`
             WHERE user_id = %s
         """
         cart_items = frappe.db.sql(cart_query, user_id, as_dict=True)
@@ -92,7 +92,7 @@ def create_order(user_id, subtotal, shipping_address, post_code, lga, discount, 
 def update_order(order_id, status=None, items=None):
     
     try:
-        order = frappe.get_doc("Sales Order", order_id)
+        order = frappe.get_doc("Order", order_id)
 
         if status:
             order.status = status
