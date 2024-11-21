@@ -52,7 +52,7 @@ def create_order(user_id, subtotal, shipping_address, post_code, lga, discount, 
                 "item_code": item["item_code"],
                 "price": item["price"],
                 "quantity": item["quantity"],
-                "seller_name": item["seller_name"]
+                "seller_name": item["seller_name"],
                 "user_id": item["user_id"]
             })
 
