@@ -56,3 +56,24 @@ def list_reviews(item_code):
         frappe.log_error(message=str(e), title="Error fetching reviews")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
+
+
+def get_average_rating(item_code):
+    try:
+        if not frappe.db.exists("Products", item_code):
+            frappe.throw(f"Product with ID {item_code} does not exist.")
+
+        average_rating = frappe.db.sql("""
+            SELECT AVG(rating) as average_rating
+            FROM `tabProduct Review`
+            WHERE item_code = %s
+        """, item_code, as_dict=True)
+
+        return {
+            "message": "Average rating fetched successfully.",
+            "average_rating": average_rating[0]["average_rating"] if average_rating else 0,
+        }
+
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "Get Average Rating Error")
+        frappe.throw(f"An error occurred: {str(e)}")

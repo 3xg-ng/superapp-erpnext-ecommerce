@@ -70,24 +70,21 @@ def create_order(user_id, subtotal, shipping_address, post_code, lga, discount, 
             "items": validated_items
         })
         
-        sales_order.insert()
+        sales_order.insert(ignore_permissions=True)
         frappe.db.commit()
 
         order_id = sales_order.name
         return create_response(SUCCESS, {"order_id": order_id})
 
     except ValueError as e:
-        # Log validation error
         frappe.log_error(f"Data validation error for user {user_id}: {str(e)}", "Order Creation Validation Error")
         return create_response(BAD_REQUEST, f"Validation error: {str(e)}")
 
     except frappe.ValidationError as e:
-        # Log Frappe validation error
         frappe.log_error(f"Frappe validation error for user {user_id}: {str(e)}", "Order Creation Validation Error")
         return create_response(BAD_REQUEST, f"Frappe validation error: {str(e)}")
 
     except Exception as e:
-        # Log unexpected errors
         frappe.log_error(f"Error creating order for user {user_id}: {str(e)}", "Order Creation Error")
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
