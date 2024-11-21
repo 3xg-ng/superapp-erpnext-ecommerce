@@ -53,6 +53,7 @@ def create_order(user_id, subtotal, shipping_address, post_code, lga, discount, 
                 "price": item["price"],
                 "quantity": item["quantity"],
                 "seller_name": item["seller_name"]
+                "user_id": item["user_id"]
             })
 
         sales_order = frappe.get_doc({
