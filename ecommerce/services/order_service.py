@@ -22,8 +22,8 @@ def list_orders(user_id):
         """
         cart_items = frappe.db.sql(cart_query, user_id, as_dict=True)
 
-        for order in orders:
-            order["item"] = cart_items
+        for cart in cart_items:
+            cart["item"] = cart_items
 
         return create_response(SUCCESS, orders)
 
