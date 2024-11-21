@@ -41,5 +41,5 @@ def modify_order(**kwargs):
 
 
 @frappe.whitelist(allow_guest=True)
-def remove_order(order_id):
-    return delete_order(order_id)
+def remove_order(order_id, user_id):
+    return delete_order(order_id, user_id)
