@@ -10,6 +10,7 @@ def get_orders(user_id):
 
 @frappe.whitelist(allow_guest=True)
 def create_new_order(**kwargs):
+    order_id= kwargs.get("order_id") 
     user_id= kwargs.get("user_id") 
     subtotal= kwargs.get("subtotal") 
     shipping_address= kwargs.get("shipping_address") 
@@ -21,7 +22,7 @@ def create_new_order(**kwargs):
     payment_method= kwargs.get("payment_method") 
     status= kwargs.get("status") 
     items= kwargs.get("items")
-    return create_order(user_id, subtotal, shipping_address, post_code, lga, discount, shipping_fee, grand_total, payment_method, status, items)
+    return create_order(order_id, user_id, subtotal, shipping_address, post_code, lga, discount, shipping_fee, grand_total, payment_method, status, items)
 
 
 @frappe.whitelist(allow_guest=True)

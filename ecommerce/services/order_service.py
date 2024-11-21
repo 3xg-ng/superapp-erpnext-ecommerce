@@ -35,7 +35,7 @@ def list_orders(user_id):
 
     
 
-def create_order(user_id, subtotal, shipping_address, post_code, lga, discount, shipping_fee, grand_total, payment_method, status, items):
+def create_order(order_id, user_id, subtotal, shipping_address, post_code, lga, discount, shipping_fee, grand_total, payment_method, status, items):
     try:
         required_keys = ["item_code", "price", "quantity", "seller_name"]
         
@@ -66,12 +66,13 @@ def create_order(user_id, subtotal, shipping_address, post_code, lga, discount, 
             "shipping_fee": shipping_fee,
             "grand_total": grand_total,
             "payment_method": payment_method,
+            "order_id": order_id,
             "user_id": user_id,
             "status": status,
             "items": validated_items
         })
         
-        sales_order.insert(ignore_permissions=True)
+        sales_order.insert()
         frappe.db.commit()
 
         order_id = sales_order.name
@@ -151,37 +152,24 @@ def update_order(order_id, user_id, subtotal, shipping_address, post_code, lga, 
 
 
 
-def delete_order(user_id, item_code=None):
+def delete_order(user_id, order_id=None):
     try:
-        if item_code:
-            if not frappe.db.exists("Order", {"user_id": user_id, "name": item_code}):
-                return create_response(NOT_FOUND, f"Item {item_code} not found in order for user {user_id}.")
+        if order_id:
+            if not frappe.db.exists("Order", {"user_id": user_id, "name": order_id}):
+                return create_response(NOT_FOUND, f"Item {order_id} not found in order for user {user_id}.")
         else:
             if not frappe.db.exists("Order", {"user_id": user_id}):
                 return create_response(NOT_FOUND, f"Order not found for user {user_id}.")
 
-        if item_code:
+        if order_id:
             frappe.db.sql("""
                 DELETE FROM `tabOrder`
                 WHERE user_id = %s AND name = %s
-            """, (user_id, item_code))
-            message = f"Item {item_code} deleted from order for user {user_id}."
+            """, (user_id, order_id))
+            message = f"Item {order_id} deleted from order for user {user_id}."
         else:
             frappe.db.sql("""
                 DELETE FROM `tabOrder`
-                WHERE user_id = %s
-            """, (user_id,))
-            message = f"Order for user {user_id} deleted successfully!"
-            
-        if item_code:
-            frappe.db.sql("""
-                DELETE FROM `tabOrder Item`
-                WHERE user_id = %s AND item_code = %s
-            """, (user_id, item_code))
-            message = f"Item {item_code} deleted from order for user {user_id}."
-        else:
-            frappe.db.sql("""
-                DELETE FROM `tabOrder Item`
                 WHERE user_id = %s
             """, (user_id,))
             message = f"Order for user {user_id} deleted successfully!"
