@@ -23,7 +23,6 @@ def add_to_wishlist(user_id, item_code):
                 "product_name": product_details["product_name"],
                 "price": product_details["new_price"],
                 "image": product_details["image"],
-                "is_favourite": product_details["is_favourite"],
             })
         new_wishlist_item.insert()
 
@@ -73,7 +72,7 @@ def remove_from_wishlist(user_id, item_code=None):
 def get_wishlist(user_id):
     try:
         query = """
-            SELECT item_code, product_name, price, image,
+            SELECT *
             FROM `tabProductWishlist`
             WHERE user_id = %s
         """
