@@ -1,52 +1,56 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2024-11-13 10:40:10.588486",
+ "creation": "2024-11-20 18:30:46.301231",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "item_code",
-  "product_name",
-  "price",
-  "image",
-  "user_id"
+  "username",
+  "rating",
+  "comment",
+  "status"
  ],
  "fields": [
   {
+   "fieldname": "rating",
+   "fieldtype": "Float",
+   "label": "Rating"
+  },
+  {
+   "fieldname": "comment",
+   "fieldtype": "Text",
+   "label": "Comment"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Pending\nApproved\nRejected"
+  },
+  {
    "fieldname": "item_code",
    "fieldtype": "Data",
-   "label": "Item Code"
+   "in_list_view": 1,
+   "label": "Item Code",
+   "reqd": 1
   },
   {
-   "fieldname": "product_name",
+   "fieldname": "username",
    "fieldtype": "Data",
-   "label": "Product name"
-  },
-  {
-   "fieldname": "price",
-   "fieldtype": "Int",
-   "label": "Price"
-  },
-  {
-   "fieldname": "image",
-   "fieldtype": "Attach Image",
-   "label": "Image",
-   "options": "image"
-  },
-  {
-   "fieldname": "user_id",
-   "fieldtype": "Data",
-   "label": "User ID"
+   "in_list_view": 1,
+   "label": "User Name",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-22 15:11:40.274785",
+ "modified": "2024-11-22 13:36:32.922326",
  "modified_by": "Administrator",
  "module": "Ecommerce",
- "name": "ProductWishlist",
+ "name": "Product Review",
  "owner": "Administrator",
  "permissions": [
   {

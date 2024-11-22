@@ -72,7 +72,7 @@ def create_order(order_id, user_id, subtotal, shipping_address, post_code, lga, 
             "items": validated_items
         })
         
-        sales_order.insert()
+        sales_order.insert(ignore_permissions=True)
         frappe.db.commit()
 
         order_id = sales_order.name
