@@ -3,7 +3,7 @@ from ecommerce.constants.http_status import SUCCESS, NOT_FOUND, SERVER_ERROR, BA
 from ecommerce.utils.response_helper import create_response
 
 
-def create_product_review(item_code, user_id, rating, comment):
+def create_product_review(item_code, username, rating, comment):
     try:
         if not (1 <= float(rating) <= 5):
             return create_response(
@@ -20,7 +20,7 @@ def create_product_review(item_code, user_id, rating, comment):
         review = frappe.get_doc({
             "doctype": "Product Review",
             "item_code": item_code,
-            "user_id": user_id,
+            "username": username,
             "rating": float(rating), 
             "comment": comment,
             "status": "Pending" 
