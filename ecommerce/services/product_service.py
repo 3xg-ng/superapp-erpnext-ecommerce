@@ -64,15 +64,12 @@ def list_items(filters=None):
 
 def list_similar_products(item_code):
     try:
-        current_product = frappe.get_doc('Products', item_code)
-        if not current_product:
-            frappe.throw(f"Product with ID {item_code} not found.")
+        if frappe.db.exists("Products", {"item_code": item_code}):
+            raise ValueError(f"Item with code '{item_code}' already exists!")
         
         similar_products = frappe.db.sql("""
-            SELECT 
-                *
-            FROM 
-                `tabProducts`
+            SELECT *
+            FROM `tabProducts`
             WHERE 
                 item_code != %(item_code)s AND
                 category = %(category)s AND
@@ -138,13 +135,11 @@ def list_items_category(limit=8, offset=0, search=None, letter=None, category=No
         if not items:
             raise frappe.DoesNotExistError("No items found!")
 
-        # Create the desired response structure
         categories = {}
         collections = {}
-        stores = {}  # Assuming you have a separate query for stores
+        stores = {}
 
         for item in items:
-            # Group by category
             category_name = item['category']
             if category_name not in categories:
                 categories[category_name] = {
@@ -153,7 +148,6 @@ def list_items_category(limit=8, offset=0, search=None, letter=None, category=No
                 }
             categories[category_name]['products'].append(item)
 
-            # Group by collection
             collection_name = item['collection']
             if collection_name not in collections:
                 collections[collection_name] = {
@@ -162,15 +156,13 @@ def list_items_category(limit=8, offset=0, search=None, letter=None, category=No
                 }
             collections[collection_name]['products'].append(item)
 
-        # Convert dict to list
         categories_list = list(categories.values())
         collections_list = list(collections.values())
 
-        # Return final structured response
         return create_response(SUCCESS, {
             'Categories': categories_list,
             'Collections': collections_list,
-            'Stores': stores  # Assuming stores are handled elsewhere
+            'Stores': stores 
         })
 
     except frappe.DoesNotExistError as e:
