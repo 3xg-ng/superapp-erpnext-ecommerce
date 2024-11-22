@@ -61,6 +61,30 @@ def list_items(filters=None):
         return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
 
 
+def get_single_product(item_code):
+    try:
+        product = frappe.db.sql(
+            """
+            SELECT *
+            FROM `tabProducts`
+            WHERE item_code = %s
+            """,
+            (item_code,),
+            as_dict=True,
+        )
+
+        if not product:
+            return create_response(NOT_FOUND, f"Product with item_code {item_code} not found.")
+
+        return create_response(SUCCESS, product[0])
+
+    except frappe.DoesNotExistError as e:
+        return create_response(NOT_FOUND, str(e))
+
+    except Exception as e:
+        frappe.log_error(message=str(e), title="Error fetching product")
+        return create_response(SERVER_ERROR, f"An unexpected error occurred: {str(e)}")
+
 
 def list_similar_products(item_code):
     try:
