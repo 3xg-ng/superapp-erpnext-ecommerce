@@ -14,7 +14,7 @@ def list_cart_items(user_id):
         items = frappe.db.sql(query, user_id, as_dict=True)
 
         if not items:
-            raise create_response(SUCCESS, [])
+            raise create_response(SERVER_ERROR, [])
 
         return create_response(SUCCESS, items)
 

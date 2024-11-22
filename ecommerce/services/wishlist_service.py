@@ -84,7 +84,7 @@ def get_wishlist(user_id):
         items = frappe.db.sql(query, user_id, as_dict=True)
 
         if not items:
-            return create_response(SUCCESS, [])
+            return create_response(SERVER_ERROR, [])
 
         return create_response(SUCCESS, items)
 

@@ -15,7 +15,7 @@ def get_category():
         items = frappe.db.sql(query, as_dict=True)
 
         if not items:
-            raise create_response(SUCCESS, [])
+            raise create_response(SERVER_ERROR, [])
 
         categories = {}
 

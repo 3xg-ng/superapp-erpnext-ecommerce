@@ -48,7 +48,7 @@ def list_reviews(item_code):
         reviews = frappe.db.sql(query, (item_code,), as_dict=True)
 
         if not reviews:
-            return create_response(SUCCESS, [])
+            return create_response(SERVER_ERROR, [])
 
         return create_response(SUCCESS, reviews)
 

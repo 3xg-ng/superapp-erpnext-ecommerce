@@ -13,7 +13,7 @@ def list_orders(user_id):
         orders = frappe.db.sql(orders_query, user_id, as_dict=True)
 
         if not orders:
-            raise create_response(SUCCESS, [])
+            raise create_response(SERVER_ERROR, [])
 
         cart_query = """
             SELECT item_code, quantity, price, seller_name

@@ -50,7 +50,7 @@ def list_items(filters=None):
         items = frappe.db.sql(query, params, as_dict=True)
 
         if not items:
-            return create_response(SUCCESS, [])
+            return create_response(SERVER_ERROR, [])
 
         return create_response(SUCCESS, items)
 
