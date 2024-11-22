@@ -124,7 +124,7 @@ def list_similar_products(item_code):
 def list_items_category(limit=8, offset=0, search=None, letter=None, category=None, min_price=None, max_price=None):
     try:
         query = """
-            SELECT item_code, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty
+            SELECT item_code, product_name, category, old_price, new_price, image, rating, brand, description, dimension, display_type, resolution, features, chipset, cpu, internal_memory, ram, battery_type, battery_life, charging, magsafe_charging, collection, model, weight, availability, color, quantity, warranty, is_favourite
             FROM `tabProducts`
             WHERE 1=1
         """
