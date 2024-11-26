@@ -38,7 +38,8 @@
   "seller_performance",
   "warranty",
   "seller_name",
-  "discount"
+  "discount",
+  "is_favourite"
  ],
  "fields": [
   {
@@ -210,11 +211,18 @@
    "fieldname": "discount",
    "fieldtype": "Float",
    "label": "Discount"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_favourite",
+   "fieldtype": "Check",
+   "label": "IsFavourite",
+   "options": "0"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-11 23:31:25.939235",
+ "modified": "2024-11-21 13:23:47.213488",
  "modified_by": "Administrator",
  "module": "Ecommerce",
  "name": "Products",

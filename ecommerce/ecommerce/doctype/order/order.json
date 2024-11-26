@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "ORDER-.MM.-.YYYY.-.#####",
  "creation": "2024-11-07 13:12:42.070263",
  "default_view": "List",
  "doctype": "DocType",
@@ -18,7 +19,8 @@
   "status",
   "user_id",
   "items",
-  "amended_from"
+  "amended_from",
+  "order_id"
  ],
  "fields": [
   {
@@ -90,15 +92,21 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "order_id",
+   "fieldtype": "Data",
+   "label": "Order ID"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-13 06:37:01.921645",
+ "modified": "2024-11-22 15:26:20.899138",
  "modified_by": "Administrator",
  "module": "Ecommerce",
  "name": "Order",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {

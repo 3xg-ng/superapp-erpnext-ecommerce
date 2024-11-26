@@ -72,7 +72,7 @@ def create_order(order_id, user_id, subtotal, shipping_address, post_code, lga, 
             "items": validated_items
         })
         
-        sales_order.insert()
+        sales_order.insert(ignore_permissions=True)
         frappe.db.commit()
 
         order_id = sales_order.name
@@ -160,11 +160,11 @@ def update_order(order_id, user_id, subtotal=None, shipping_address=None, post_c
 
 
 
-def delete_order(user_id, order_id=None):
+def delete_order(user_id, order_id):
     try:
         if order_id:
             if not frappe.db.exists("Order", {"user_id": user_id, "name": order_id}):
-                return create_response(NOT_FOUND, f"Item {order_id} not found in order for user {user_id}.")
+                return create_response(NOT_FOUND, f"{order_id} not found in order for user {user_id}.")
         else:
             if not frappe.db.exists("Order", {"user_id": user_id}):
                 return create_response(NOT_FOUND, f"Order not found for user {user_id}.")
@@ -174,7 +174,8 @@ def delete_order(user_id, order_id=None):
                 DELETE FROM `tabOrder`
                 WHERE user_id = %s AND name = %s
             """, (user_id, order_id))
-            message = f"Item {order_id} deleted from order for user {user_id}."
+            # message = f"Item {order_id} deleted from order for user {user_id}."
+            message = f"{order_id} order has been deleted successfully."
         else:
             frappe.db.sql("""
                 DELETE FROM `tabOrder`
@@ -186,7 +187,7 @@ def delete_order(user_id, order_id=None):
         return create_response(SUCCESS, message)
 
     except frappe.DoesNotExistError as e:
-        frappe.log_error(f"Item or order does not exist: {str(e)}", "Delete Order Error")
+        frappe.log_error(f"Order does not exist: {str(e)}", "Delete Order Error")
         return create_response(NOT_FOUND, "Order item or order does not exist.")
     except Exception as e:
         frappe.log_error(f"Error deleting order or item for user {user_id}: {str(e)}", "Delete Order Error")
