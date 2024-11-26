@@ -75,7 +75,7 @@ def create_order(order_id, user_id, subtotal, shipping_address, post_code, lga, 
         sales_order.insert(ignore_permissions=True)
         frappe.db.commit()
 
-        order_id = sales_order.name
+        order_id = sales_order.order_id
         return create_response(SUCCESS, {"order_id": order_id})
 
     except ValueError as e:
@@ -174,7 +174,7 @@ def delete_order(user_id, order_id):
                 DELETE FROM `tabOrder`
                 WHERE user_id = %s AND name = %s
             """, (user_id, order_id))
-            # message = f"Item {order_id} deleted from order for user {user_id}."
+            
             message = f"{order_id} order has been deleted successfully."
         else:
             frappe.db.sql("""
